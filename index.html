@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chris Clark · AI Program Portfolio</title>
+<style>
+:root {
+  --bg-deep: #1F3A5F;
+  --bg-panel: #12233D;
+  --ivory: #F8F4EB;
+  --cream: #EFE7D2;
+  --gold: #B7902F;
+  --gold-lt: #E5C678;
+  --slate: #3A3A3A;
+  --muted: #6B6B6B;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg-deep);
+  color: var(--ivory);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 60px 32px 80px 32px; }
+.brand {
+  font-family: Georgia, serif;
+  font-size: 12px; letter-spacing: 0.4em;
+  color: var(--gold-lt); margin-bottom: 16px;
+}
+h1 {
+  font-family: Georgia, serif; font-size: 56px;
+  color: var(--ivory); letter-spacing: 0.02em; margin-bottom: 8px;
+}
+.tag {
+  font-size: 16px; color: var(--gold-lt); font-style: italic;
+  margin-bottom: 8px;
+}
+.who {
+  font-size: 13px; color: var(--cream); margin-bottom: 36px; opacity: 0.8;
+}
+.bar { width: 60px; height: 3px; background: var(--gold); margin-bottom: 32px; }
+.intro {
+  font-size: 17px; line-height: 1.55; color: var(--cream);
+  max-width: 780px; margin-bottom: 48px;
+}
+.cards {
+  display: grid; gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+}
+.card {
+  background: var(--bg-panel);
+  border: 1px solid #30527E;
+  border-radius: 6px;
+  padding: 24px 26px;
+  text-decoration: none; color: var(--ivory);
+  display: block; transition: all 0.18s ease;
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+  background: var(--gold);
+}
+.card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.card .kicker {
+  font-size: 10px; letter-spacing: 0.35em; color: var(--gold-lt);
+  font-weight: bold; margin-bottom: 8px;
+}
+.card h2 {
+  font-family: Georgia, serif; font-size: 24px; color: var(--ivory);
+  margin-bottom: 8px;
+}
+.card p { font-size: 13px; line-height: 1.5; color: var(--cream); margin-bottom: 18px; opacity: 0.9; }
+.card .links { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-block;
+  padding: 5px 10px; border-radius: 14px;
+  background: rgba(229,198,120,0.12);
+  border: 1px solid rgba(229,198,120,0.4);
+  color: var(--gold-lt);
+  font-size: 11px; letter-spacing: 0.05em;
+}
+.foot {
+  margin-top: 56px; padding-top: 24px;
+  border-top: 1px solid #30527E;
+  font-size: 12px; color: var(--cream); opacity: 0.7;
+  display: flex; justify-content: space-between;
+}
+.foot a { color: var(--gold-lt); text-decoration: none; }
+@media (max-width: 600px) {
+  h1 { font-size: 38px; }
+  .wrap { padding: 36px 20px 60px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">CHRIS CLARK · AI PROGRAM PORTFOLIO</div>
+  <h1>Live demos</h1>
+  <div class="tag">Senior AI Program Manager</div>
+  <div class="who">Working artifacts from the Spyglass program at a $1B CPG manufacturer.</div>
+  <div class="bar"></div>
+
+  <p class="intro">
+    These prototypes are working artifacts from the Spyglass enterprise AI program.
+    They were built end to end with Claude as alignment tools for the Steering Committee.
+    Every screen renders live data structures, the tabs are interactive, and the underlying
+    HTML is hand-authored. No screenshots, no mock images.
+  </p>
+
+  <div class="cards">
+
+    <a class="card" href="spyglass.html">
+      <div class="kicker">SUPPLY CHAIN CONTROL TOWER</div>
+      <h2>Spyglass Operations Prototype</h2>
+      <p>
+        Live operational view of the Byrne supply chain across three plants.
+        Network overview, KPI scorecard, scenario simulator, plant floor display.
+        Twelve interactive tabs covering OTIF, MAPE, SKU 360, exception handling and decision support.
+      </p>
+      <div class="links">
+        <span class="chip">Network Overview</span>
+        <span class="chip">RFP KPI Scorecard</span>
+        <span class="chip">Scenario Simulator</span>
+        <span class="chip">+9 more tabs</span>
+      </div>
+    </a>
+
+    <a class="card" href="ppm.html">
+      <div class="kicker">PROGRAM CONTROL TOWER</div>
+      <h2>Spyglass PPM Prototype</h2>
+      <p>
+        How I manage the program itself. Spend, burn, EVM by workstream, sprints by phase,
+        KPI and outcome achievement, SteerCo status with RAID log, weekly summaries,
+        actions and ROI. Designed to ingest from Jira and Smartsheet.
+      </p>
+      <div class="links">
+        <span class="chip">Overview</span>
+        <span class="chip">EVM</span>
+        <span class="chip">SteerCo · RAID</span>
+        <span class="chip">SteerCo · ROI</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="foot">
+    <div>Prototypes are illustrative. No real customer or vendor pricing data is exposed.</div>
+    <div><a href="mailto:chris.clark@clarkfamilyusa.com">chris.clark@clarkfamilyusa.com</a></div>
+  </div>
+</div>
+</body>
+</html>
