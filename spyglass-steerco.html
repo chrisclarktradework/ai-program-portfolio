@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Spyglass SteerCo Dashboard — Snapshot 28 Jun 2026</title>
+<style>
+:root{color-scheme:light;
+ --bg-deep:#F3EAD6;--bg-panel:#FCF8EE;--bg-surface:#E9DEC6;--border-lt:#D8C9A8;
+ --text:#2D2015;--text-muted:#5C4A2E;--text-dim:#8A7856;--gold:#A9832C;--gold-br:#7A5E15;--cream:#352513;
+ --good:#3E7142;--good-s:#3E7142;--warn:#B07A1E;--warn-s:#9A6B12;--bad:#B33A1B;--bad-br:#A8331A;
+ --jira:#1E6FE0;--jira-bg:rgba(38,132,255,0.12);--ss:#2E8B57;--ss-bg:rgba(46,139,87,0.12);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg-deep);color:var(--text);font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px}
+a{color:var(--gold);text-decoration:none}a:hover{text-decoration:underline}
+header.topbar{display:flex;align-items:center;gap:18px;padding:13px 20px;background:var(--bg-panel);border-bottom:2px solid var(--gold)}
+.brand{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.brand .logo{height:46px;width:auto;display:block;border-radius:6px;box-shadow:0 1px 4px rgba(90,65,30,.18)}
+.brand .name{font-family:Georgia,serif;font-size:23px;letter-spacing:.13em;color:var(--cream)}
+.brand .tag{font-size:9px;letter-spacing:.3em;color:var(--gold)}
+.title-block{flex:1}.title-block .title{font-family:Georgia,serif;font-size:16px;color:var(--cream)}
+.title-block .sub{font-size:11px;color:var(--text-muted);margin-top:3px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid}
+.pill .dot{width:9px;height:9px;border-radius:50%}
+.pill.good{border-color:var(--good-s);color:var(--good);background:rgba(62,113,66,.15)}.pill.good .dot{background:var(--good)}
+.pill.warn{border-color:var(--warn-s);color:var(--warn);background:rgba(184,134,11,.15)}.pill.warn .dot{background:var(--warn)}
+.pill.bad{border-color:var(--bad);color:var(--bad-br);background:rgba(179,58,27,.15)}.pill.bad .dot{background:var(--bad-br)}
+nav.tabs{display:flex;padding:0 14px;background:var(--bg-panel);border-bottom:1px solid var(--border-lt);overflow-x:auto}
+nav.tabs button{background:none;border:none;color:var(--text-muted);padding:11px 14px;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit}
+nav.tabs button.active{color:var(--gold-br);border-bottom-color:var(--gold);background:rgba(212,168,83,.08)}
+main{padding:16px 20px 60px;max-width:1500px;margin:0 auto}
+.pane{display:none}.pane.active{display:block}
+.grid{display:grid;gap:13px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1000px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+.panel{background:var(--bg-panel);border:1px solid var(--border-lt);border-radius:5px;padding:13px 15px;position:relative}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);opacity:.5}
+.panel.good::before{background:var(--good-s);opacity:1}.panel.warn::before{background:var(--warn-s);opacity:1}.panel.bad::before{background:var(--bad);opacity:1}
+.panel h2{font-family:Georgia,serif;font-size:13px;letter-spacing:.15em;color:var(--gold);margin-bottom:3px;text-transform:uppercase;font-weight:normal}
+.panel .sub{font-size:9.5px;letter-spacing:.13em;color:var(--text-dim);margin-bottom:11px;text-transform:uppercase}
+.kpi{font-family:Georgia,serif;font-size:32px;color:var(--cream);line-height:1}.kpi.sm{font-size:24px}
+.kpi-lbl{font-size:10px;letter-spacing:.11em;color:var(--text-dim);text-transform:uppercase;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);padding:6px 7px;border-bottom:1px solid var(--border-lt)}
+td{padding:6px 7px;border-bottom:1px solid rgba(107,89,68,.4)}
+.tag-rag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700}
+.rag-red{background:rgba(179,58,27,.22);color:var(--bad-br);border:1px solid var(--bad)}
+.rag-amber{background:rgba(184,134,11,.2);color:var(--warn);border:1px solid var(--warn-s)}
+.rag-green{background:rgba(62,113,66,.2);color:var(--good);border:1px solid var(--good-s)}
+.chip{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;margin-right:4px}
+.chip.jira{background:var(--jira-bg);color:#1E6FE0;border:1px solid var(--jira)}
+.chip.ss{background:var(--ss-bg);color:#226B43;border:1px solid var(--ss)}
+.bar{height:11px;background:var(--bg-surface);border-radius:6px;overflow:hidden;margin-top:5px}.bar>i{display:inline-block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.sw{width:11px;height:11px;border-radius:2px;display:inline-block}
+.lb-row{display:flex;align-items:center;gap:11px;padding:7px 5px;border-bottom:1px solid rgba(107,89,68,.4)}
+.lb-rank{font-family:Georgia,serif;font-size:17px;color:var(--gold);width:24px;text-align:center}
+.lb-name{flex:1;font-weight:600}.lb-bar{flex:2;max-width:320px}.lb-val{font-family:Georgia,serif;font-size:15px;color:var(--cream);width:36px;text-align:right}
+.note{font-size:10.5px;color:var(--text-dim);line-height:1.6;margin-top:9px}
+.mt{margin-top:13px}.big-rag{font-family:Georgia,serif;font-size:42px;letter-spacing:.07em;line-height:1}
+.wkchip{background:var(--bg-surface);border:1px solid var(--border-lt);color:var(--text-muted);padding:5px 12px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.04em}
+.wkchip:hover{border-color:var(--gold)}
+.wkchip.wk-active{background:var(--gold);color:#fff;border-color:var(--gold-br)}
+.rag-input{display:flex;justify-content:space-between;align-items:center;padding:9px 4px;border-bottom:1px solid rgba(107,89,68,.4);gap:10px}
+.mini{font-size:10px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase}
+.exec{font-size:12.5px;line-height:1.8;color:var(--text-muted)}
+.donut-wrap{display:flex;align-items:center;gap:14px}
+#loading{padding:40px;text-align:center;color:var(--text-muted)}
+.spin{display:inline-block;width:22px;height:22px;border:3px solid var(--bg-surface);border-top-color:var(--gold);border-radius:50%;animation:s 0.9s linear infinite;vertical-align:middle;margin-right:10px}
+@keyframes s{to{transform:rotate(360deg)}}
+body{font-size:13.5px}
+.panel{box-shadow:0 1px 4px rgba(90,65,30,.10)}
+th{color:#6B5B3A}
+td{color:#352513}
+tr:nth-child(even) td{background:rgba(168,131,44,.06)}
+.note{color:#6B5B3A}.kpi-lbl{color:#7A6438}.mini{color:#7A6438}
+a{color:#8A6A1E}
+nav.tabs{box-shadow:0 1px 3px rgba(90,65,30,.08)}
+.src{position:absolute;top:11px;right:12px;font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:#1E6FE0;background:var(--jira-bg);border:1px solid var(--jira);border-radius:10px;padding:2px 8px;font-weight:700;z-index:2}
+.src.ss{color:#226B43;background:var(--ss-bg);border-color:var(--ss)}
+.src:hover{text-decoration:none;filter:brightness(.93)}
+.srcbar{display:inline-flex;gap:7px;flex-wrap:wrap;align-items:center;margin-left:6px}
+.srcbar a{font-size:9px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:11px}
+.srcbar a.j{color:#1E6FE0;background:var(--jira-bg);border:1px solid var(--jira)}
+.srcbar a.s{color:#226B43;background:var(--ss-bg);border:1px solid var(--ss)}
+.src-inline{font-size:9px;font-weight:700;color:#226B43;border:1px solid var(--ss);background:var(--ss-bg);border-radius:9px;padding:1px 6px;letter-spacing:.04em;white-space:nowrap}
+.src-inline.j{color:#1E6FE0;border-color:var(--jira);background:var(--jira-bg)}
+.why{display:inline-block;margin-left:7px;font-size:8.5px;font-weight:700;color:#8A6A1E;background:rgba(168,131,44,.12);border:1px solid var(--gold);border-radius:9px;padding:1px 7px;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;white-space:nowrap}
+.why:hover{filter:brightness(.94)}
+.why::before{content:'ⓘ ';}
+.modal{display:none;position:fixed;inset:0;background:rgba(45,32,21,.5);z-index:60;align-items:flex-start;justify-content:center;padding:60px 20px;overflow:auto}
+.modal.show{display:flex}
+.modal-card{background:var(--bg-panel);border:1px solid var(--gold);border-radius:8px;max-width:600px;width:100%;padding:22px 24px;box-shadow:0 10px 40px rgba(45,32,21,.4);position:relative}
+.modal-x{position:absolute;top:10px;right:15px;font-size:24px;color:var(--text-muted);cursor:pointer;line-height:1}
+.modal-body h3{font-family:Georgia,serif;color:var(--gold-br);font-size:17px;margin-bottom:4px}
+.modal-body .msub{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px}
+.modal-body p{font-size:12.5px;color:var(--text-muted);line-height:1.65;margin:8px 0}
+.modal-body .mrow{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border-lt);font-size:12px}
+.modal-body .mrow b{color:var(--cream)}
+.modal-body .formula{background:var(--bg-surface);border-left:3px solid var(--gold);padding:8px 11px;border-radius:0 4px 4px 0;font-size:12px;color:var(--cream);margin:10px 0;line-height:1.6}
+.modebar{padding:6px 20px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;text-align:center;border-bottom:1px solid var(--border-lt)}
+.modebar.live{background:rgba(62,113,66,.14);color:var(--good)}
+.modebar.snap{background:rgba(168,131,44,.16);color:var(--gold-br)}
+.bcard{text-align:center}
+.bcard-h{font-family:Georgia,serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.bcard-v{font-family:Georgia,serif;font-size:30px;color:var(--cream);line-height:1}
+.bcard-verdict{font-size:12px;font-weight:700;letter-spacing:.04em;margin:3px 0 4px;text-transform:uppercase}
+.bcard-sub{font-size:10px;color:var(--text-dim);letter-spacing:.03em;margin-top:3px}
+.hm{display:inline-flex;flex-direction:column;gap:4px;margin-top:8px}
+.hm-row{display:flex;gap:4px;align-items:center}
+.hm-cell{width:50px;height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.hm-axis{width:20px;text-align:center;font-size:10px;color:var(--text-dim);font-weight:700}
+.hm-xlab{width:50px;text-align:center;font-size:10px;color:var(--text-dim);font-weight:700}
+.hm-axes{font-size:9.5px;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-top:7px}
+.err{color:var(--bad-br);font-size:12px;padding:8px;background:rgba(179,58,27,.1);border:1px solid var(--bad);border-radius:4px;margin-top:8px}
+</style>
+</head>
+<body>
+<header class="topbar">
+ <div class="brand"><img class="logo" src="data:image/jpeg;base64,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" alt="Byrne Spyglass"/><div class="tag">SPYGLASS PPM DASHBOARD</div></div>
+ <div class="title-block"><div class="title">PPM Live Control Tower · Snapshot 28 Jun 2026</div>
+  <div class="sub">Project Spyglass · Phase 0 Discovery (Week 2 of 6) · point-in-time snapshot · 28 Jun 2026 · v2.3</div>
+  <div class="srcbar"><a class="j" href="https://byrne1933.atlassian.net/issues/?jql=project%20%3D%20SPY%20ORDER%20BY%20assignee%20ASC" target="_blank" rel="noopener">↗ Jira SPY</a><a class="s" href="https://app.smartsheet.com/sheets/2rcgVxqM9F6CQ4X8VcMHVhW6HgPp7RJcmQfF5VF1" target="_blank" rel="noopener">↗ Project Plan</a><a class="s" href="https://app.smartsheet.com/sheets/7pw4J6CpH65Vmw2fGHf6JQmCvwXj8jFmh5fGXXq1" target="_blank" rel="noopener">↗ Risk Log</a><a class="s" href="https://app.smartsheet.com/sheets/5mqM4X4qFx8WHvXpCWVr5wrr6GV64GG9PM33jR51" target="_blank" rel="noopener">↗ Billings</a></div></div>
+ <div id="ragPill"></div>
+</header>
+<div id="modebanner" class="modebar"></div>
+<nav class="tabs" id="tabs"></nav>
+<main id="main"><div id="loading"><span class="spin"></span>Pulling live data from Jira (SPY) and Smartsheet…</div></main>
+<div id="infoModal" class="modal"><div class="modal-card"><span class="modal-x">×</span><div class="modal-body"></div></div></div>
+
+<script>
+/* ===== stable reference data (deliverables / KPIs / exec / RAG model) ===== */
+const REF={
+ asElapsed:0.33, /* week 2 of 6 */
+ bac:3600000, perMonth:200000, months:18, phase0Budget:300000, rate:200,
+ byrnePlannedToDate:100000, /* fixed-price prorated, week 2 of 6 of Phase 0 */
+ deliverables:[
+  ["D1","Current-state assessment: all 9 workstreams","Shay Abbott","In Progress","21 Jul"],
+  ["D2","WS0 Business Case + Incentive Proposal (v1)","Chris Clark","In Progress","30 Jun"],
+  ["D3","Redwood readiness view + gap log","Neelan Singh","In Progress","3 Jul"],
+  ["D4a","Integration map","Yamini Lakkaraju","Not Started","3 Jul"],
+  ["D4b","Intellinum inventory sync analysis (2 options)","Prasad Bumireddy","In Progress","3 Jul"],
+  ["D5","Cutover hypothesis + blackout-safe sequencing","Shay Abbott","Not Started","3 Jul"],
+  ["D6","Baseline team plan: named resources","Shay Abbott","Not Started","3 Jul"],
+  ["D7","Risk register (manufacturing-specific)","Shay Abbott","Not Started","3 Jul"],
+  ["D8","OCM assessment, change-readiness, AI governance","Sunita Pandey","Not Started","3 Jul"],
+  ["D9a","Quick-wins backlog (v1)","Chris Clark","In Progress","30 Jun"],
+  ["D9b","Inventory accuracy demonstration","Anand Yadav","Not Started","21 Jul"],
+  ["D10","KPI baselines, targets, measurement method","Shay Abbott","In Progress","14 Jul"],
+  ["D11","Tooling & governance setup (Jira/Smartsheet/EVM)","Shay Abbott","In Progress","30 Jun"],
+  ["D12","Stage Gate 1 review & acceptance","Chris Clark","Not Started","28 Jul"],
+  ["D13","Detailed program plan + agile release plan","Shay Abbott","In Progress","21 Jul"],
+  ["D14","Security & privilege assessment","Yamini Lakkaraju","Not Started","21 Jul"],
+  ["D15","Agent architecture proposal","Yamini Lakkaraju","Not Started","21 Jul"],
+  ["D16","Workstream HTML prototype","Glenn Kauffman","In Progress","21 Jul"]],
+ kpis:[["OTIF — On Time","TBD (Ph0)","96%","3"],["OTIF — In Full","TBD (Ph0)","90%","3"],
+  ["Inventory accuracy (WMS vs Fusion)","shortfall","99.5%","1"],["Forecast accuracy (MAPE)","20-25%","<15%","4.1"],
+  ["Finance close cycle time","TBD","-40%","5"],["Planner manual touches / cycle","TBD","-50%","4.2"],
+  ["Exception resolution SLA","ad hoc","95% in 24h","5"],["Manual reporting hours / month","TBD","Reduce","3"]],
+ exec:"Week 2 closed out the on-site discovery sprint at Byrne Dairy, completing 11+ workshops across all major workstreams. The inventory sync gap between WMS and Oracle Fusion is confirmed as the highest-priority technical risk; Intellinum is engaged with an on-site visit on June 30 to develop two resolution options. Week 3 shifts from discovery to documentation while maintaining momentum on D2, D9a, D10 and D11.",
+ /* ===== OBJECTIVE RAG MODEL — thresholds shown to the user ===== */
+ ragModel:[
+  {key:"Schedule", desc:"Deliverables past due and not complete (of 18 Phase 0).",
+   g:"0 overdue", a:"1-2 overdue", r:"3+ overdue"},
+  {key:"Completion vs planned", desc:"Combined task completion ÷ planned for this point (~20% by week 2).",
+   g:"ratio ≥ 1.0", a:"0.6 – 0.99", r:"< 0.6"},
+  {key:"Open severe risks", desc:"Count of open Red risks in the Risk Log.",
+   g:"0 – 2 Red", a:"3 – 5 Red", r:"6+ Red"},
+  {key:"Budget (Byrne cash)", desc:"Fixed-price spend vs plan, within the $3.6M envelope.",
+   g:"≤ plan", a:"1 – 10% over", r:"> 10% over"}],
+ plannedPctByNow:0.20 /* expected % complete by week 2 of Phase 0 */
+};
+const SHEET={bill:2779675062390660, risk:6602404999942020, plan:7673662252470148};
+const CLOUD="866e77f7-c70e-40b8-8563-fd4a3d8ea5d7";
+/* ===== source drilldown URLs (open + update the underlying data) ===== */
+const LINKS={
+ jiraIssues:"https://byrne1933.atlassian.net/issues/?jql=project%20%3D%20SPY%20ORDER%20BY%20assignee%20ASC",
+ jiraDone:"https://byrne1933.atlassian.net/issues/?jql=project%20%3D%20SPY%20AND%20statusCategory%20%3D%20Done",
+ jiraBrowse:"https://byrne1933.atlassian.net/browse/",
+ ssBill:"https://app.smartsheet.com/sheets/5mqM4X4qFx8WHvXpCWVr5wrr6GV64GG9PM33jR51",
+ ssRisk:"https://app.smartsheet.com/sheets/7pw4J6CpH65Vmw2fGHf6JQmCvwXj8jFmh5fGXXq1",
+ ssPlan:"https://app.smartsheet.com/sheets/2rcgVxqM9F6CQ4X8VcMHVhW6HgPp7RJcmQfF5VF1"
+};
+const srcLink=(url,label,kind)=>`<a class="src ${kind==='ss'?'ss':''}" href="${url}" target="_blank" rel="noopener" title="Open the source data in a new tab">↗ ${label||'source'}</a>`;
+const srcTag=(url,label,kind)=>`<a class="src-inline ${kind==='j'?'j':''}" href="${url}" target="_blank" rel="noopener">↗ ${label}</a>`;
+const SS="mcp__2d89b4ed-99e8-43a6-8c79-376fe1e79142__get_sheet_summary";
+const JIRA="mcp__e29580e7-b090-4ec1-82b0-d0a7330caa3b__searchJiraIssuesUsingJql";
+
+/* ===== helpers ===== */
+const $=s=>document.querySelector(s);
+async function mcp(name,args){ throw new Error('snapshot: live disabled'); const r=await window.cowork.callMcpTool(name,args);
+ if(r.isError) throw new Error(typeof r.content?.[0]?.text==='string'?r.content[0].text:'tool error');
+ return r.structuredContent ?? JSON.parse(r.content[0].text);}
+function sheetRows(res){const idx={};(res.availableColumns||[]).forEach(c=>idx[c.title]=c.index);
+ const rows=(res.rows||[]).map(r=>{const o={};(r.cells||[]).forEach(c=>{o[c.columnIndex]=c.value;});
+   const out={};for(const t in idx) out[t]=o[idx[t]]; return out;}); return rows;}
+const money=n=>"$"+Math.round(n).toLocaleString();
+const moneyK=n=>"$"+Math.round(n/1000)+"k";
+const moneyKs=n=>(n<0?"−$":"$")+Math.round(Math.abs(n)/1000)+"k";
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const ragCls=r=>r==="Red"?"bad":r==="Amber"?"warn":"good";
+const ragTag=r=>`<span class="tag-rag rag-${r.toLowerCase()}">${r.toUpperCase()}</span>`;
+function donut(p,color,size=110,lbl=""){const r=size/2-11,c=2*Math.PI*r,off=c*(1-p/100);
+ return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#E4D8BF" stroke-width="10"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 ${size/2} ${size/2})"/><text x="50%" y="48%" text-anchor="middle" fill="#2D2015" font-family="Georgia" font-size="${size*.24}">${p}%</text><text x="50%" y="64%" text-anchor="middle" fill="#6B5B3A" font-size="9">${lbl}</text></svg>`;}
+function stack(segs){const t=segs.reduce((a,s)=>a+s.v,0)||1;let h='<div class="bar">';segs.forEach(s=>h+=`<i style="width:${s.v/t*100}%;background:${s.color}"></i>`);return h+'</div>';}
+function evmCurve(weeks,pv,ev,ac,eac,bac,nowIdx,w=540,h=250){
+ const top=14, vals=[bac,...pv,...ac.filter(x=>x!=null),...eac.filter(x=>x!=null)], max=Math.max(...vals)*1.12, pad=46;
+ const X=i=>pad+i*((w-pad-14)/(weeks.length-1)), Y=v=>h-30-(v/max)*(h-30-top);
+ const line=(arr,col,dash)=>{let d="",on=false;arr.forEach((v,i)=>{if(v==null){on=false;return;}d+=(on?" L":"M")+X(i)+" "+Y(v);on=true;});return `<path d="${d}" fill="none" stroke="${col}" stroke-width="2.4" ${dash?'stroke-dasharray="6 5"':''}/>`;};
+ const dots=(arr,col)=>arr.map((v,i)=>v==null?'':`<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="${col}"/>`).join("");
+ let grid="";[0,.25,.5,.75,1].forEach(f=>{const v=max*f;grid+=`<line x1="${pad}" y1="${Y(v)}" x2="${w-12}" y2="${Y(v)}" stroke="#E4D8BF"/><text x="6" y="${Y(v)+3}" fill="#6B5B3A" font-size="8">$${Math.round(v/1000)}k</text>`;});
+ let xl="";weeks.forEach((wk,i)=>xl+=`<text x="${X(i)}" y="${h-12}" fill="#6B5B3A" font-size="8" text-anchor="middle">${wk}</text>`);
+ const bacL=`<line x1="${pad}" y1="${Y(bac)}" x2="${w-12}" y2="${Y(bac)}" stroke="#D4A853" stroke-width="1.4" stroke-dasharray="3 3"/><text x="${w-14}" y="${Y(bac)-4}" fill="#D4A853" font-size="9" text-anchor="end">BAC $${Math.round(bac/1000)}k</text>`;
+ const now=`<line x1="${X(nowIdx)}" y1="${top}" x2="${X(nowIdx)}" y2="${h-30}" stroke="#A7906A" stroke-dasharray="4 4"/><text x="${X(nowIdx)}" y="${top+8}" fill="#6B5B3A" font-size="8" text-anchor="middle">TIME NOW</text>`;
+ return `<svg width="100%" viewBox="0 0 ${w} ${h}">${grid}${bacL}${now}${line(pv,'#4F86C6')}${line(ev,'#5FA052')}${line(ac,'#C0392B')}${line(eac,'#9DC3E6',true)}${dots(ev,'#5FA052')}${dots(ac,'#C0392B')}${xl}</svg>`;
+}
+function barBA(items,w=320,h=220){
+ const pad=46, max=Math.max(...items.map(i=>i.v))*1.18, slot=(w-pad-12)/items.length, bw=Math.min(54,slot-22);
+ const Y=v=>h-32-(v/max)*(h-32-18);
+ let grid="";[0,.5,1].forEach(f=>{const v=max*f;grid+=`<line x1="${pad}" y1="${Y(v)}" x2="${w-8}" y2="${Y(v)}" stroke="#E4D8BF"/><text x="6" y="${Y(v)+3}" fill="#6B5B3A" font-size="8">$${Math.round(v/1000)}k</text>`;});
+ let bars="";items.forEach((it,i)=>{const x=pad+i*slot+(slot-bw)/2, y=Y(it.v);bars+=`<rect x="${x}" y="${y}" width="${bw}" height="${h-32-y}" fill="${it.color}" rx="2"/><text x="${x+bw/2}" y="${y-5}" fill="#2D2015" font-size="10" text-anchor="middle">$${Math.round(it.v/1000)}k</text><text x="${x+bw/2}" y="${h-16}" fill="#6B5B3A" font-size="9" text-anchor="middle">${it.lbl}</text>`;});
+ return `<svg width="100%" viewBox="0 0 ${w} ${h}">${grid}${bars}</svg>`;
+}
+/* ---- multi-series line chart with a value label at EVERY data point ---- */
+function lineChartV(o){
+ const w=o.w||560,h=o.h||260,padL=o.padL||50,padR=o.padR||16,padT=20,padB=36;
+ const fmt=o.fmt||(v=>v), gfmt=o.gridFmt||fmt, n=o.cats.length;
+ let vals=[]; o.series.forEach(s=>s.data.forEach(v=>{if(v!=null)vals.push(v);}));
+ if(o.baseline) vals.push(o.baseline.v);
+ let max=o.ymax!=null?o.ymax:Math.max(...vals), min=o.ymin!=null?o.ymin:Math.min(0,...vals);
+ if(max===min)max=min+1; const span=max-min; max+=span*0.16; min-=span*0.06;
+ const X=i=>padL+i*((w-padL-padR)/Math.max(1,n-1)), Y=v=>h-padB-((v-min)/(max-min))*(h-padB-padT);
+ let grid="";for(let k=0;k<=4;k++){const v=min+(max-min)*k/4;grid+=`<line x1="${padL}" y1="${Y(v).toFixed(1)}" x2="${w-padR}" y2="${Y(v).toFixed(1)}" stroke="#E4D8BF"/><text x="${padL-5}" y="${(Y(v)+3).toFixed(1)}" fill="#6B5B3A" font-size="8" text-anchor="end">${gfmt(v)}</text>`;}
+ let xl="";o.cats.forEach((c,i)=>xl+=`<text x="${X(i).toFixed(1)}" y="${h-12}" fill="#6B5B3A" font-size="8.5" text-anchor="middle">${c}</text>`);
+ let base="";if(o.baseline){const by=Y(o.baseline.v);base=`<line x1="${padL}" y1="${by.toFixed(1)}" x2="${w-padR}" y2="${by.toFixed(1)}" stroke="${o.baseline.color||'#A9832C'}" stroke-width="1.3" stroke-dasharray="4 3"/><text x="${w-padR}" y="${(by-4).toFixed(1)}" fill="${o.baseline.color||'#A9832C'}" font-size="8.5" text-anchor="end">${o.baseline.label}</text>`;}
+ let body="";
+ o.series.forEach(s=>{let d="",on=false;
+   if(s.connect){const pts=s.data.map((v,i)=>[i,v]).filter(p=>p[1]!=null);pts.forEach((p,k)=>d+=(k?" L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1));}
+   else s.data.forEach((v,i)=>{if(v==null){on=false;return;}d+=(on?" L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1);on=true;});
+   body+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.3" ${s.dash?'stroke-dasharray="6 5"':''}/>`;});
+ // draw points + value labels; at each x, rank series by value so labels never overlap (top above, rest stacked below), with a cream halo for legibility
+ o.cats.forEach((c,i)=>{const here=o.series.map(s=>({v:s.data[i],col:s.color})).filter(p=>p.v!=null).sort((a,b)=>b.v-a.v);
+   here.forEach((p,rank)=>{const yy=Y(p.v),ly=rank===0?yy-8:yy+8+rank*10;
+     body+=`<circle cx="${X(i).toFixed(1)}" cy="${yy.toFixed(1)}" r="3" fill="${p.col}"/>`+
+       `<text x="${X(i).toFixed(1)}" y="${ly.toFixed(1)}" fill="${p.col}" font-size="8.5" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#FCF8EE" stroke-width="2.8" stroke-linejoin="round">${fmt(p.v)}</text>`;});});
+ return `<svg width="100%" viewBox="0 0 ${w} ${h}">${grid}${base}${xl}${body}</svg>`;
+}
+/* ---- grouped vertical Budget-vs-Actual bars (per period) with value labels ---- */
+function groupedBarV(cats,series,o){
+ o=o||{};const w=o.w||560,h=o.h||250,padL=50,padR=14,padT=22,padB=44;
+ let vals=[];series.forEach(s=>s.data.forEach(v=>vals.push(v||0)));
+ const max=(Math.max(...vals)||1)*1.2, n=cats.length, gw=(w-padL-padR)/n, ng=series.length, bw=Math.min(36,(gw-12)/ng);
+ const Y=v=>h-padB-(v/max)*(h-padB-padT);
+ let grid="";for(let k=0;k<=4;k++){const v=max*k/4;grid+=`<line x1="${padL}" y1="${Y(v).toFixed(1)}" x2="${w-padR}" y2="${Y(v).toFixed(1)}" stroke="#E4D8BF"/><text x="${padL-5}" y="${(Y(v)+3).toFixed(1)}" fill="#6B5B3A" font-size="8" text-anchor="end">$${Math.round(v/1000)}k</text>`;}
+ let bars="";cats.forEach((c,i)=>{const gx=padL+i*gw+(gw-bw*ng-3)/2;
+   series.forEach((s,j)=>{const v=s.data[i]||0,x=gx+j*(bw+3),y=Y(v);
+     bars+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${(h-padB-y).toFixed(1)}" fill="${s.color}" rx="1.5"/><text x="${(x+bw/2).toFixed(1)}" y="${(y-4).toFixed(1)}" fill="${s.color}" font-size="8.5" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#FCF8EE" stroke-width="2.6" stroke-linejoin="round">$${Math.round(v/1000)}k</text>`;});
+   bars+=`<text x="${(padL+i*gw+gw/2).toFixed(1)}" y="${h-24}" fill="#6B5B3A" font-size="8.5" text-anchor="middle">${c}</text>`;});
+ return `<svg width="100%" viewBox="0 0 ${w} ${h}">${grid}${bars}</svg>`;
+}
+/* ---- Phase 0 timeline: 6 weeks, Friday check-ins, "you are here" pointer ---- */
+function timeline(){
+ const MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+ let asof; if(window.__ASOF){const a=String(window.__ASOF).split('-');asof=new Date(+a[0],+a[1]-1,+a[2]);} else asof=new Date();
+ const tlStart=new Date(2026,5,19), dayms=86400000; /* Fri Jun 19 2026 = first check-in */
+ const pts=[]; for(let i=0;i<6;i++){const d=new Date(tlStart.getTime()+i*7*dayms); pts.push([d.toLocaleString('en-US',{month:'short',day:'numeric'}),'Wk '+(i+1)]);}
+ let nowFrac=(asof-tlStart)/(7*dayms); nowFrac=Math.max(0,Math.min(5,nowFrac));
+ let doneIdx=-1; for(let i=0;i<6;i++){if(asof>=new Date(tlStart.getTime()+i*7*dayms))doneIdx=i;}
+ const youTxt='YOU ARE HERE · '+asof.getDate()+' '+MON[asof.getMonth()];
+ const w=940,h=132,padL=56,padR=56,y=72; const X=i=>padL+i*((w-padL-padR)/(pts.length-1));
+ let s=`<svg width="100%" viewBox="0 0 ${w} ${h}">`;
+ s+=`<line x1="${X(0)}" y1="${y}" x2="${X(pts.length-1)}" y2="${y}" stroke="#D8C9A8" stroke-width="3"/>`;
+ s+=`<line x1="${X(0)}" y1="${y}" x2="${X(nowFrac).toFixed(1)}" y2="${y}" stroke="#3E7142" stroke-width="3"/>`;
+ pts.forEach((p,i)=>{const done=i<=doneIdx,cx=X(i);
+   s+=`<text x="${cx}" y="${y-20}" text-anchor="middle" font-size="9" fill="#6B5B3A" letter-spacing=".08em">${p[1].toUpperCase()} CHECK-IN</text>`;
+   s+=`<circle cx="${cx}" cy="${y}" r="8.5" fill="${done?'#3E7142':'#FCF8EE'}" stroke="${done?'#3E7142':'#A9832C'}" stroke-width="2.5"/>`;
+   if(done) s+=`<path d="M${(cx-4).toFixed(1)} ${y} l3 3 l5 -6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+   s+=`<text x="${cx}" y="${y+28}" text-anchor="middle" font-size="12.5" fill="#352513" font-family="Georgia,serif">${p[0]}</text>`;
+   s+=`<circle cx="${cx}" cy="${y}" r="17" fill="transparent" data-wk="${i}" style="cursor:pointer"/>`;});
+ const nx=X(nowFrac); s+=`<line x1="${nx.toFixed(1)}" y1="${y-44}" x2="${nx.toFixed(1)}" y2="${y+9}" stroke="#C0392B" stroke-width="2"/>`;
+ s+=`<polygon points="${(nx-5).toFixed(1)},${y-44} ${(nx+5).toFixed(1)},${y-44} ${nx.toFixed(1)},${y-36}" fill="#C0392B"/>`;
+ s+=`<text x="${nx.toFixed(1)}" y="${y-48}" text-anchor="middle" font-size="10" font-weight="700" fill="#C0392B" paint-order="stroke" stroke="#FCF8EE" stroke-width="3" stroke-linejoin="round">${youTxt}</text>`;
+ return s+`</svg>`;
+}
+/* ---- drilldown "why?" button ---- */
+const why=k=>`<span class="why" data-info="${k}">why?</span>`;
+/* ---- 3-rectangle RAG indicator: green/amber/red, active band enlarged with score, key below ---- */
+function ragWidget(rag, score){
+ const bands=[['GREEN','good','62,113,66'],['AMBER','warn','176,122,30'],['RED','bad','179,58,27']];
+ const txtv={good:'--good',warn:'--warn',bad:'--bad-br'};
+ const rects=bands.map(([lbl,cls,rgb])=>{const active=lbl===rag.toUpperCase();
+   const bg=active?`rgb(${rgb})`:`rgba(${rgb},0.10)`, tx=active?'#fff':`var(${txtv[cls]})`;
+   return `<div style="flex:${active?2.1:1};display:flex;align-items:center;justify-content:center;gap:9px;height:${active?62:40}px;background:${bg};border:2px solid rgb(${rgb});border-radius:7px;color:${tx}${active?';box-shadow:0 2px 9px rgba(45,32,21,.25)':''}"><span style="font-family:Georgia,serif;font-size:${active?17:12}px;font-weight:700;letter-spacing:.07em">${lbl}</span>${active?`<span style="font-family:Georgia,serif;font-size:21px;font-weight:800">${score}/10</span>`:''}</div>`;}).join('');
+ return `<div style="display:flex;gap:8px;align-items:stretch">${rects}</div><div style="display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim)"><span><b style="color:var(--good)">Green</b> 0-2</span><span><b style="color:var(--warn)">Amber</b> 3-5</span><span><b style="color:var(--bad-br)">Red</b> 6-10</span></div>`;
+}
+/* ---- Excel-style Budget vs Actual: grey bars + colored variance connector + $ labels ---- */
+function budgetActual(rows,o){
+ o=o||{};const w=o.w||540,h=o.h||330,padL=54,padR=18,padT=52,padB=58;
+ const max=Math.max(...rows.flatMap(r=>[r.b,r.a]),1)*1.2, n=rows.length, slot=(w-padL-padR)/n, bw=Math.min(30,(slot-30)/2);
+ const Y=v=>h-padB-(v/max)*(h-padB-padT);
+ let s=`<svg width="100%" viewBox="0 0 ${w} ${h}">`;
+ for(let k=0;k<=5;k++){const v=max*k/5,yy=Y(v);s+=`<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${w-padR}" y2="${yy.toFixed(1)}" stroke="#E4D8BF"/><text x="${(padL-6)}" y="${(yy+3).toFixed(1)}" fill="#6B5B3A" font-size="8" text-anchor="end">$${Math.round(v/1000)}k</text>`;}
+ const base=h-padB;
+ rows.forEach((r,i)=>{const cx=padL+i*slot+slot/2, bx=cx-bw-3, ax=cx+3, byT=Y(r.b), ayT=Y(r.a);
+   s+=`<rect x="${bx.toFixed(1)}" y="${byT.toFixed(1)}" width="${bw}" height="${(base-byT).toFixed(1)}" fill="#DDE0E2" stroke="#B4B9BC"/>`;
+   s+=`<rect x="${ax.toFixed(1)}" y="${ayT.toFixed(1)}" width="${bw}" height="${(base-ayT).toFixed(1)}" fill="#A6ACB0" stroke="#8A9094"/>`;
+   s+=`<text x="${(bx+bw/2).toFixed(1)}" y="${(base-7)}" fill="#4a4036" font-size="8.5" text-anchor="start" transform="rotate(-90 ${(bx+bw/2).toFixed(1)} ${(base-7)})">$${r.b.toLocaleString()}</text>`;
+   s+=`<text x="${(ax+bw/2).toFixed(1)}" y="${(base-7)}" fill="#3a3a3a" font-size="8.5" text-anchor="start" transform="rotate(-90 ${(ax+bw/2).toFixed(1)} ${(base-7)})">$${r.a.toLocaleString()}</text>`;
+   const v=r.a-r.b, fav=v<=0, col=fav?'#2E9E50':'#D0432F', top=Math.min(byT,ayT), bot=Math.max(byT,ayT);
+   s+=`<rect x="${(cx-3).toFixed(1)}" y="${top.toFixed(1)}" width="6" height="${Math.max(1,bot-top).toFixed(1)}" fill="${col}" stroke="${fav?'#1F7D3C':'#A8331A'}" stroke-dasharray="2 2" opacity="0.9"/>`;
+   const lbl=`${fav?'▲':'▼'} $${Math.abs(Math.round(v/1000))}k (${r.vp>0?'+':''}${r.vp}%)`;
+   s+=`<line x1="${cx.toFixed(1)}" y1="${top.toFixed(1)}" x2="${cx.toFixed(1)}" y2="${(padT-4).toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="3 2"/>`;
+   s+=`<text x="${cx.toFixed(1)}" y="${(padT-8)}" fill="${col}" font-size="10.5" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="#FCF8EE" stroke-width="3" stroke-linejoin="round">${lbl}</text>`;
+   s+=`<text x="${cx.toFixed(1)}" y="${(h-20)}" fill="#6B5B3A" font-size="9" text-anchor="middle">${r.c}</text>`;});
+ s+=`<rect x="${padL}" y="${h-12}" width="10" height="10" fill="#DDE0E2" stroke="#B4B9BC"/><text x="${padL+15}" y="${h-3}" font-size="9" fill="#6B5B3A">Budget</text>`;
+ s+=`<rect x="${padL+78}" y="${h-12}" width="10" height="10" fill="#A6ACB0" stroke="#8A9094"/><text x="${padL+93}" y="${h-3}" font-size="9" fill="#6B5B3A">Actual</text>`;
+ return s+`</svg>`;
+}
+
+/* ---- bullet chart: measure bar, target marker, qualitative bands ---- */
+function bullet(o){
+ const w=300,h=50,padL=4,padR=4,barY=22,barH=12, max=o.max||Math.max(o.value,o.target||0)*1.4||1;
+ const X=v=>padL+(Math.max(0,Math.min(v,max))/max)*(w-padL-padR);
+ let s=`<svg width="100%" viewBox="0 0 ${w} ${h}">`;
+ (o.bands||[]).forEach(b=>{const x0=X(b.from||0),x1=X(b.to);s+=`<rect x="${x0.toFixed(1)}" y="${barY-3}" width="${Math.max(0,x1-x0).toFixed(1)}" height="${barH+6}" fill="${b.color}" opacity="0.16"/>`;});
+ s+=`<rect x="${padL}" y="${barY}" width="${Math.max(0,X(o.value)-padL).toFixed(1)}" height="${barH}" rx="2" fill="${o.color||'#352513'}"/>`;
+ if(o.vlab){const vx=X(o.value),end=vx>w*0.74;s+=`<text x="${(end?vx-3:vx).toFixed(1)}" y="${barY-6}" text-anchor="${end?'end':'middle'}" font-size="11.5" font-weight="800" fill="${o.color||'#352513'}" paint-order="stroke" stroke="#FCF8EE" stroke-width="3" stroke-linejoin="round">${o.vlab}</text>`;}
+ if(o.target!=null){const tx=X(o.target);s+=`<line x1="${tx.toFixed(1)}" y1="${barY-4}" x2="${tx.toFixed(1)}" y2="${barY+barH+4}" stroke="#2D2015" stroke-width="2.5"/>`;
+   if(o.tlab)s+=`<text x="${tx.toFixed(1)}" y="${barY+barH+15}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#2D2015" paint-order="stroke" stroke="#FCF8EE" stroke-width="3" stroke-linejoin="round">${o.tlab}</text>`;}
+ return s+`</svg>`;
+}
+function bulletCard(o){
+ return `<div class="bcard"><div class="bcard-h">${o.label}</div><div class="bcard-v">${o.big}</div>`+
+  `<div class="bcard-verdict" style="color:${o.vcolor}">${o.verdict}</div>`+
+  bullet({value:o.value,target:o.target,max:o.max,bands:o.bands,color:o.barColor,vlab:o.vlab,tlab:o.tlab})+
+  `<div class="bcard-sub">${o.sub}</div></div>`;
+}
+/* ---- risk heat map: 5x5 likelihood x impact, count per cell ---- */
+function heatmap(rk){
+ const g={}; rk.forEach(r=>{if(r.l>=1&&r.i>=1){const k=r.l+'_'+r.i; g[k]=(g[k]||0)+1;}});
+ const zone=(l,i)=>{const p=l*i; return p>=15?'#B33A1B':p>=8?'#B07A1E':'#3E7142';};
+ let rows='';
+ for(let l=5;l>=1;l--){let row=`<div class="hm-axis">${l}</div>`;
+   for(let i=1;i<=5;i++){const c=g[l+'_'+i]||0;row+=`<div class="hm-cell" style="background:${zone(l,i)};opacity:${c?1:0.14}">${c||''}</div>`;}
+   rows+=`<div class="hm-row">${row}</div>`;}
+ rows+=`<div class="hm-row"><div class="hm-axis"></div>`+[1,2,3,4,5].map(i=>`<div class="hm-xlab">${i}</div>`).join('')+`</div>`;
+ return `<div class="hm">${rows}</div><div class="hm-axes">Likelihood (rows, 5 = high) &times; Impact (columns, 5 = high) · number = open risks in that cell · red corner = highest exposure</div>`;
+}
+
+/* ===== Jira paginated fetch ===== */
+async function fetchJira(){
+ let token=null, nodes=[];
+ for(let i=0;i<4;i++){
+   const args={cloudId:CLOUD, jql:"project = SPY AND issuetype != Epic ORDER BY assignee ASC",
+     maxResults:100, fields:["status","assignee","issuetype"], responseContentFormat:"markdown"};
+   if(token) args.nextPageToken=token;
+   const res=await mcp(JIRA,args);
+   const n=res.issues?.nodes||[]; nodes=nodes.concat(n);
+   const pi=res.issues?.pageInfo||{}; if(!pi.hasNextPage||!pi.endCursor) break; token=pi.endCursor;
+ }
+ const cat={}, asgTot={}, asgDone={}, types={};
+ nodes.forEach(x=>{const f=x.fields||{};const c=((f.status||{}).statusCategory||{}).name||'?';
+   cat[c]=(cat[c]||0)+1;const a=(f.assignee||{}).displayName||'Unassigned';asgTot[a]=(asgTot[a]||0)+1;
+   if(c==='Done')asgDone[a]=(asgDone[a]||0)+1;types[(f.issuetype||{}).name||'?']=(types[(f.issuetype||{}).name||'?']||0)+1;});
+ return {total:nodes.length, done:cat['Done']||0, inprog:cat['In Progress']||0, todo:cat['To Do']||0, asgTot, asgDone, types};
+}
+
+/* ===== main load ===== */
+async function load(){ return; /* SNAPSHOT: live disabled */ 
+ try{
+  const [billR, riskR, planR, jira] = await Promise.all([
+   mcp(SS,{sheet_id:SHEET.bill, columns:["Consultant","Role","Firm","Hours","Amount","Status","Week Start"]}),
+   mcp(SS,{sheet_id:SHEET.risk, columns:["Title","Severity (1-10)","RAG","Workstream","Response / Mitigation / Action","Status"]}),
+   mcp(SS,{sheet_id:SHEET.plan, columns:["Task Name","Status","% Complete","Assigned To"]}),
+   fetchJira()
+  ]);
+  render(sheetRows(billR), sheetRows(riskR), sheetRows(planR), jira);
+ }catch(e){ $("#main").innerHTML=`<div class="err">Could not load live data: ${e.message}. Open this artifact inside Cowork with the Jira and Smartsheet connectors enabled.</div>`; }
+}
+
+function render(bill, risks, plan, jira){
+ /* ----- billings / AC ----- */
+ let ac=0, acWk1=0; const byCons={};
+ bill.forEach(r=>{const amt=Number(r.Amount)||0; ac+=amt; if((r["Week Start"]||'').indexOf('2026-06-15')===0) acWk1+=amt; const k=r.Consultant; if(!k)return;
+   if(!byCons[k])byCons[k]={role:r.Role||'',firm:r.Firm||'',hours:0,amt:0};
+   byCons[k].hours+=Number(r.Hours)||0; byCons[k].amt+=amt;});
+ const consList=Object.entries(byCons).sort((a,b)=>b[1].amt-a[1].amt);
+
+ /* ----- risks ----- */
+ const rk=risks.filter(r=>r.Title).map(r=>({t:r.Title,s:Number(r["Severity (1-10)"])||0,rag:(r.RAG||'').trim(),ws:r.Workstream||'',m:r["Response / Mitigation / Action"]||'',l:Number(r.L)||0,i:Number(r.I)||0}));
+ const red=rk.filter(r=>r.rag==='Red').length, amber=rk.filter(r=>r.rag==='Amber').length, green=rk.filter(r=>r.rag==='Green').length;
+ const severe=rk.filter(r=>r.s>=8).length;
+ const topRisks=rk.slice().sort((a,b)=>b.s-a.s).slice(0,15);
+
+ /* ----- plan (Smartsheet) ----- */
+ const ssDone=plan.filter(r=>r.Status==='Done').length, ssIp=plan.filter(r=>r.Status==='In Progress').length, ssTot=plan.length;
+ const ssDoneBy={}; plan.forEach(r=>{if(r.Status==='Done'&&r["Assigned To"]){const n=r["Assigned To"];ssDoneBy[n]=(ssDoneBy[n]||0)+1;}});
+
+ /* ----- combined ----- */
+ const totDone=jira.done+ssDone, totTasks=jira.total+ssTot, combPct=pct(totDone,totTasks);
+
+ /* ----- leaderboard ----- */
+ const norm={"neelan.singh":"Neelan Singh","anand.yadav":"Anand Yadav"};
+ const lb={};
+ for(const[k,v]of Object.entries(jira.asgDone)){if(k==='Unassigned')continue;const n=norm[k]||k;lb[n]=(lb[n]||0)+v;}
+ for(const[k,v]of Object.entries(ssDoneBy)){const n=norm[k]||k;lb[n]=(lb[n]||0)+v;}
+ const lbArr=Object.entries(lb).sort((a,b)=>b[1]-a[1]); const lbMax=(lbArr[0]||[0,1])[1]||1;
+ /* ----- per-person task metrics: total / done / % / velocity / rank ----- */
+ const weeksElapsed=2;
+ const ppl={}; const ens=n=>ppl[n]||(ppl[n]={tot:0,done:0});
+ for(const[k,v]of Object.entries(jira.asgTot||{})){if(k==='Unassigned')continue;ens(norm[k]||k).tot+=v;}
+ for(const[k,v]of Object.entries(jira.asgDone||{})){if(k==='Unassigned')continue;ens(norm[k]||k).done+=v;}
+ plan.forEach(r=>{const nm=r["Assigned To"]; if(!nm)return; const p=ens(norm[nm]||nm); p.tot++; if(r.Status==='Done')p.done++;});
+ const velRate=v=>v>=2?'High':v>=1?'Steady':v>=0.5?'Building':v>0?'Ramping':'—';
+ const velCls=v=>v>=1?'rag-green':v>=0.5?'rag-amber':'rag-red';
+ const pplArr=Object.entries(ppl).map(([n,p])=>({n,tot:p.tot,done:p.done,pct:p.tot?Math.round(p.done/p.tot*100):0,vel:p.done/weeksElapsed})).sort((a,b)=>b.vel-a.vel||b.pct-a.pct||b.tot-a.tot);
+
+ /* ----- EVM (effort-based) — weekly Phase 0 trend ----- */
+ const evFix=Math.round((combPct/100)*REF.phase0Budget);
+ const cpiEffort= ac? (evFix/ac):0;
+ const pvNow=REF.byrnePlannedToDate, cv=evFix-ac, sv=evFix-pvNow;
+ // aggregate the Billings Log by week-start to get per-week actual cost & hours
+ const wkMap={}; bill.forEach(r=>{const ws=(r["Week Start"]||'').slice(0,10); if(!ws)return;
+   if(!wkMap[ws])wkMap[ws]={amt:0,h:0}; wkMap[ws].amt+=Number(r.Amount)||0; wkMap[ws].h+=Number(r.Hours)||0;});
+ const wkKeys=Object.keys(wkMap).sort();
+ const acWk=wkKeys.map(k=>wkMap[k].amt);                 // actual $ per elapsed week
+ const ac1=acWk[0]||0, ac2=acWk[1]!=null?(ac1+acWk[1]):ac; // cumulative
+ const BAC0=REF.phase0Budget;                            // Phase 0 budget $300k
+ const weeksX=["Jun 22","Jun 29","Jul 6","Jul 13","Jul 20","Jul 28"]; // week-ending labels
+ const pvSeries=[50000,100000,150000,200000,250000,300000];           // planned cumulative
+ const ev1=Math.round(evFix*(ac1/(ac||1)));             // earned at wk1 (proportional est.)
+ const evSeries=[ev1, evFix, null,null,null,null];
+ const acSeries=[ac1, ac2, null,null,null,null];
+ // variances per elapsed week
+ const cvSeries=[ev1-ac1, evFix-ac2, null,null,null,null];
+ const svSeries=[ev1-pvSeries[0], evFix-pvSeries[1], null,null,null,null];
+ // performance indices per elapsed week
+ const cpi1=ac1?ev1/ac1:0, cpi2=ac2?evFix/ac2:0;
+ const spi1=ev1/pvSeries[0], spi2=evFix/pvSeries[1];
+ const cpiSeries=[+cpi1.toFixed(2), +cpi2.toFixed(2), null,null,null,null];
+ const spiSeries=[+spi1.toFixed(2), +spi2.toFixed(2), null,null,null,null];
+ // estimate at completion (effort to finish): EAC = AC + (BAC − EV); final = BAC ÷ CPI
+ const eac1=ac1+(BAC0-ev1), eac2=ac2+(BAC0-evFix);
+ const eacFinal= cpi2? Math.round(BAC0/cpi2): BAC0;
+ const eacSeries=[eac1, eac2, null,null,null, eacFinal];
+ const bacSeries=[BAC0,BAC0,BAC0,BAC0,BAC0,BAC0];
+ // simple Budget-vs-Actual by billing week: planned full-staff vs actual effort
+ const plannedWk=consList.length*40*REF.rate;          // 12 consultants × 40h × rate
+ const baCats=wkKeys.map((k,i)=>["Jun 16–22","Jun 23–29","Jun 30–Jul 6","Jul 7–13"][i]||("Wk "+(i+1)));
+ const baBudget=wkKeys.map(()=>plannedWk);
+ const baActual=wkKeys.map(k=>wkMap[k].amt);
+
+ /* ===== OBJECTIVE RAG ENGINE ===== */
+ const overdue=0; // earliest deliverable due Jun 30; none past due yet
+ const ratio= combPct/(REF.plannedPctByNow*100);
+ function score(input){
+   if(input==='Schedule') return overdue===0?0:overdue<=2?1:2;
+   if(input==='Completion') return ratio>=1?0:ratio>=0.6?1:2;
+   if(input==='Risk') return red<=2?0:red<=5?1:2;
+   if(input==='Budget') {const over=(ac/REF.byrnePlannedToDate); /* effort vs Byrne plan */
+     /* Byrne CASH is fixed & on-plan -> Green; effort overage is vendor-side, shown separately */ return 0;}
+ }
+ const ragOf=s=>s===0?'Green':s===1?'Amber':'Red';
+ const inputs=[
+  {k:'Schedule', key:'schedule', s:score('Schedule'), v:`${overdue} of 18 deliverables overdue · earliest due 30 Jun`},
+  {k:'Completion vs planned', key:'completion', s:score('Completion'), v:`${combPct}% complete vs ~${Math.round(REF.plannedPctByNow*100)}% planned · ratio ${ratio.toFixed(2)}`},
+  {k:'Open severe risks', key:'risk', s:score('Risk'), v:`${red} Red · ${severe} at severity 8+ · ${rk.filter(r=>r.s>=10).length} at 10`},
+  {k:'Budget (Byrne cash)', key:'budget', s:score('Budget'), v:`~${money(REF.byrnePlannedToDate)} fixed-price to date, on the $200k/mo plan`}
+ ];
+ const total=inputs.reduce((a,i)=>a+i.s,0);
+ const overall= total<=1?'Green': total<=4?'Amber':'Red';
+ const overallCls=ragCls(overall);
+ const score10=Math.round(total/8*10); // 0-8 composite scaled to a 0-10 score
+ const sc2=s=>s===0?'GREEN (0)':s===1?'AMBER (1)':'RED (2)';
+ const WHY={
+  overall:`<h3>Overall Project RAG</h3><div class="msub">Objective composite · score ${score10} / 10</div>
+   <p>The headline RAG is not self-reported. Four independent inputs are each scored <b>Green = 0, Amber = 1, Red = 2</b>, then summed to a 0–8 score.</p>
+   <div class="mrow"><span>Schedule drift</span><b>${sc2(inputs[0].s)}</b></div>
+   <div class="mrow"><span>Completion vs planned</span><b>${sc2(inputs[1].s)}</b></div>
+   <div class="mrow"><span>Open severe risks</span><b>${sc2(inputs[2].s)}</b></div>
+   <div class="mrow"><span>Budget (Byrne cash)</span><b>${sc2(inputs[3].s)}</b></div>
+   <div class="formula">Inputs ${inputs[0].s}+${inputs[1].s}+${inputs[2].s}+${inputs[3].s} = ${total} of 8, scaled to a 0–10 score → <b>${score10} / 10</b> · 0–2 = GREEN · 3–5 = AMBER · 6–10 = RED → <b>${overall.toUpperCase()}</b></div>
+   <p>No single Amber can force the project Red; it takes multiple failing dimensions. Open the Project Status &amp; RAG tab for the full threshold table.</p>`,
+  schedule:`<h3>Schedule input</h3><div class="msub">Score: ${sc2(inputs[0].s)}</div>
+   <p>Counts Phase 0 deliverables past their baseline finish date and not yet complete.</p>
+   <div class="formula">0 overdue → GREEN · 1–2 → AMBER · 3+ → RED</div>
+   <div class="mrow"><span>Currently overdue</span><b>${overdue} of 18</b></div><p>Earliest deliverable is due 30 Jun, so nothing is overdue yet.</p>`,
+  completion:`<h3>Completion vs planned input</h3><div class="msub">Score: ${sc2(inputs[1].s)}</div>
+   <p>Actual % complete divided by the % that should be done by today (≈${Math.round(REF.plannedPctByNow*100)}% by Week 2).</p>
+   <div class="formula">ratio ≥ 1.0 → GREEN · 0.60–0.99 → AMBER · &lt; 0.60 → RED</div>
+   <div class="mrow"><span>Combined complete</span><b>${combPct}% (${totDone}/${totTasks})</b></div>
+   <div class="mrow"><span>Planned by now</span><b>~${Math.round(REF.plannedPctByNow*100)}%</b></div>
+   <div class="mrow"><span>Ratio</span><b>${ratio.toFixed(2)}</b></div>`,
+  risk:`<h3>Open severe risks input</h3><div class="msub">Score: ${sc2(inputs[2].s)}</div>
+   <p>Counts open <b>Red</b> risks in the Risk Log. A risk is Red when its severity (likelihood × impact, 1–10) is high.</p>
+   <div class="formula">0–2 Red → GREEN · 3–5 → AMBER · 6+ → RED</div>
+   <div class="mrow"><span>Open Red risks</span><b>${red}</b></div>
+   <div class="mrow"><span>At severity 8+</span><b>${severe}</b></div>`,
+  budget:`<h3>Budget input (Byrne cash)</h3><div class="msub">Score: ${sc2(inputs[3].s)}</div>
+   <p>Tracks Byrne's <b>fixed-price cash</b> vs plan. Byrne pays ${money(REF.perMonth)}/month regardless of vendor hours, so cash is on plan by construction and this input is Green.</p>
+   <div class="formula">≤ plan → GREEN · 1–10% over → AMBER · &gt; 10% over → RED</div>
+   <p>Vendor <b>effort</b> (currently ${money(ac)}) is shown separately as a diagnostic on the EVM tab so it never falsely flags Byrne's budget.</p>`,
+  riskrag:`<h3>How each risk's RAG is set</h3><div class="msub">Risk Log · severity-driven</div>
+   <p>Every risk gets a <b>severity 1–10</b> from likelihood × impact (each rated 1–5). The RAG band follows the severity, and the register is ranked by it.</p>
+   <div class="formula">Severity 8–10 → RED · 5–7 → AMBER · 1–4 → GREEN</div>
+   <div class="mrow"><span>Open Red</span><b>${red}</b></div><div class="mrow"><span>Amber</span><b>${amber}</b></div><div class="mrow"><span>Green</span><b>${green}</b></div>
+   <p>Click the ↗ Risk Log link to see likelihood, impact, owner and mitigation behind each score.</p>`,
+  velocity:`<h3>How velocity &amp; rank are set</h3><div class="msub">Tasks &amp; Completion</div>
+   <p>For each person we count tasks completed across SPY Jira and the 01 Project Plan, then divide by weeks elapsed since the Jun 16 kickoff.</p>
+   <div class="formula">Velocity = tasks done ÷ ${weeksElapsed} weeks · Rank #1 = highest velocity</div>
+   <div class="mrow"><span>Rating bands</span><b>High ≥2 · Steady ≥1 · Building ≥0.5 · Ramping &gt;0</b></div>
+   <p>Ties break by % complete, then by total assigned. Unassigned items are excluded.</p>`,
+  budgetstatus:`<h3>How Budget vs Actual status is set</h3><div class="msub">Budget tab · per billing week</div>
+   <p><b>Budget</b> = planned full staffing (${consList.length} consultants × 40h × $${REF.rate}/wk). <b>Actual</b> = effort actually billed that week.</p>
+   <div class="formula">Var = Actual − Budget · Actual ≤ Budget → ▲ under (favorable, green) · Actual &gt; Budget → ▼ over (red)</div>
+   <p>Hours are a SWAG pending bi-monthly actuals: Shay 40h/wk, all other consultants 20h/wk, Magdalena Krol 0h. That is why early weeks read under the full-staffing budget.</p>`
+ };
+
+ /* ===== RENDER ===== */
+ $("#ragPill").innerHTML=`<span class="pill ${overallCls}"><span class="dot"></span>PROJECT: ${overall.toUpperCase()}</span>${why('overall')}`;
+ const TABS=[["overview","Overview"],["status","Project Status & RAG"],["tasks","Tasks & Completion"],["risks","Risk Register"],["budgetdash","Budget"],["budget","EVM"],["deliverables","Deliverables"],["kpis","KPIs"],["weekly","Weekly"],["ocm","OCM"]];
+ $("#tabs").innerHTML=TABS.map((t,i)=>`<button data-t="${t[0]}" class="${i?'':'active'}">${t[1]}</button>`).join("");
+ $("#main").innerHTML=TABS.map(t=>`<section class="pane" id="x-${t[0]}"></section>`).join("");
+ document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".pane").forEach(x=>x.classList.remove("active"));b.classList.add("active");$("#x-"+b.dataset.t).classList.add("active");});
+ $("#x-overview").classList.add("active");
+ const __mb=document.querySelector('#infoModal .modal-body'), __md=document.getElementById('infoModal');
+ const WEEKS=[
+  {wk:'Week 1',dates:'Jun 16–22',rag:'Green',focus:'Mobilization and the on-site discovery sprint at East Syracuse.',due:['Kickoff','Phase 0 team confirmed','11+ discovery workshops'],note:'All major workstreams covered on-site; program foundation established.'},
+  {wk:'Week 2',dates:'Jun 23–29',rag:overall,current:true,focus:'Discovery shifts to documentation; inventory-sync deep dive.',due:['D11 tooling and governance','prep D2 / D9a / D10'],note:`${combPct}% of tasks complete · ${red} open Red risks · SOW signature still outstanding.`},
+  {wk:'Week 3',dates:'Jun 30–Jul 6',rag:'Planned',focus:'Intellinum on-site (Jun 30) to develop two WMS↔Fusion options; documentation push.',due:['D2 v1 (30 Jun)','D9a v1 (30 Jun)','D11 (30 Jun)','start D3 / D4 / D5'],note:'The highest-priority technical risk (inventory sync) gets resolution options.'},
+  {wk:'Week 4',dates:'Jul 7–13',rag:'Planned',focus:'Current-state assessments (D1) and the KPI baseline framework.',due:['D1 assessments','D10 final (7 Jul)','D13 draft'],note:'Mid-sprint: D1–D11 tracking toward the Byrne review.'},
+  {wk:'Week 5',dates:'Jul 14–20',rag:'Planned',focus:'Redwood readiness, the Spyglass prototype, and security / agent design.',due:['D3 (14 Jul)','D16 prototype (14 Jul)','D14','D15'],note:'Design-oriented deliverables converge.'},
+  {wk:'Week 6',dates:'Jul 21–28',rag:'Planned',focus:'Finalize deliverables and the Stage Gate 1 acceptance review.',due:['D6','D7','D9b','D13 final','D12 Stage Gate 1 (28 Jul)'],note:'Stage Gate 1 review with Chris Clark; Phase 1 go / no-go decision.'}
+ ];
+ function weekHTML(i){const w=WEEKS[i];
+  const chip=w.rag==='Planned'?'<span class="tag-rag" style="background:var(--bg-panel);color:var(--text-dim);border:1px solid var(--border-lt)">PLANNED</span>':ragTag(w.rag);
+  return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><b style="font-family:Georgia,serif;font-size:15px;color:var(--cream)">${w.wk}</b><span class="mini">${w.dates}</span>${chip}${w.current?'<span class="mini" style="color:var(--gold-br)">● current week</span>':''}</div><div class="note" style="margin-top:7px"><b style="color:var(--cream)">Focus:</b> ${w.focus}</div><div style="margin:8px 0 3px"><span class="mini">Key items</span></div><div>${w.due.map(d=>`<span class="chip ss" style="margin:0 5px 5px 0;display:inline-block">${d}</span>`).join('')}</div><div class="note">${w.note}</div>`;}
+ function renderWeek(i){const el=document.getElementById('weekSummary'); if(el)el.innerHTML=weekHTML(i); document.querySelectorAll('.wkchip').forEach(c=>c.classList.toggle('wk-active', c.getAttribute('data-wk')===String(i)));}
+ document.addEventListener('click',e=>{
+   const wk=e.target.closest('[data-wk]'); if(wk){ renderWeek(+wk.getAttribute('data-wk')); return; }
+   const t=e.target.closest('[data-info]');
+   if(t){__mb.innerHTML=WHY[t.getAttribute('data-info')]||''; __md.classList.add('show'); return;}
+   if(e.target.classList.contains('modal-x')||e.target===__md) __md.classList.remove('show');});
+
+ $("#x-overview").innerHTML=`<div class="panel"><h2>Phase 0 Timeline</h2><div class="sub">6-week discovery sprint · Friday check-ins · click any week (chip or dot) for its summary</div>${timeline()}<div id="weekStrip" style="display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 0">${WEEKS.map((w,i)=>`<button class="wkchip${i===1?' wk-active':''}" data-wk="${i}">${w.wk.replace('Week ','Wk ')}</button>`).join('')}</div><div id="weekSummary" style="margin-top:11px;padding:12px 14px;background:var(--bg-surface);border:1px solid var(--border-lt);border-radius:6px">${weekHTML(1)}</div></div>
+ <div class="grid g4 mt">
+  <div class="panel ${overallCls}"><h2>Overall Status${why('overall')}</h2><div class="sub">Objective RAG · score ${score10}/10</div>${ragWidget(overall,score10)}<div class="note">Computed from four inputs (see Project Status &amp; RAG tab). Not self-reported.</div></div>
+  <div class="panel"><h2>Task Completion</h2><div class="sub">Jira + Smartsheet</div><div class="donut-wrap">${donut(combPct,'#D4A853',110,'DONE')}<div><div class="kpi sm">${totDone}<span style="font-size:13px;color:var(--text-dim)"> / ${totTasks}</span></div><div class="note"><span class="chip jira">Jira ${jira.done}/${jira.total}</span><span class="chip ss">Plan ${ssDone}/${ssTot}</span></div></div></div></div>
+  <div class="panel good">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>Budget${why('budget')}</h2><div class="sub">Fixed price</div><div class="kpi sm">${money(REF.byrnePlannedToDate)}</div><div class="kpi-lbl">Byrne cost to date (on plan)</div><div class="note">of ${money(REF.bac)} · ${money(REF.perMonth)}/mo × ${REF.months}. Automus effort delivered: ${money(ac)}.</div></div>
+  <div class="panel bad">${srcLink(LINKS.ssRisk,'Risk Log','ss')}<h2>Risk${why('riskrag')}</h2><div class="sub">Open register</div><div style="display:flex;gap:14px"><div><div class="kpi sm" style="color:var(--bad-br)">${red}</div><div class="kpi-lbl">Red</div></div><div><div class="kpi sm" style="color:var(--warn)">${amber}</div><div class="kpi-lbl">Amber</div></div><div><div class="kpi sm" style="color:var(--good)">${green}</div><div class="kpi-lbl">Green</div></div></div><div class="note">${severe} at severity 8+.</div></div>
+ </div>
+ <div class="grid g2 mt"><div class="panel"><h2>Executive Summary</h2><div class="sub">Phase 0 · Week 2 of 6</div><p class="exec">${REF.exec}</p></div>
+  <div class="panel"><h2>Effort vs Fixed Price</h2><div class="sub">Diagnostic</div>
+   <div class="note" style="font-size:12px;color:var(--text-muted)">Byrne pays a fixed ${money(REF.perMonth)}/month. Automus + Intellinum effort to date (hours × $${REF.rate}) totals <b style="color:var(--cream)">${money(ac)}</b> across ${consList.length} consultants — roughly in line with the prorated ${money(REF.byrnePlannedToDate)} cash plan. Hours are a SWAG (Shay 40h/wk, all other consultants 20h/wk, Magdalena Krol 0h) pending bi-monthly actuals — informational, not a Byrne budget risk.</div></div>
+ </div>`;
+
+ $("#x-status").innerHTML=`<div class="grid g3">
+  <div class="panel ${overallCls}"><h2>Objective RAG${why('overall')}</h2><div class="sub">Composite score ${score10} / 10</div>${ragWidget(overall,score10)}<div class="note">Each input scored Green=0, Amber=1, Red=2, summed (0-8) and scaled to a 0-10 score. 0-2 = Green · 3-5 = Amber · 6-10 = Red.</div></div>
+  <div class="panel" style="grid-column:span 2"><h2>RAG Inputs (live)</h2><div class="sub">The four objective drivers</div>
+   ${inputs.map(i=>`<div class="rag-input"><div><b style="color:var(--cream)">${i.k}</b><br><span class="note" style="margin:0">${i.v}</span></div><div style="display:flex;align-items:center">${ragTag(ragOf(i.s))}${why(i.key)}</div></div>`).join("")}</div></div>
+  <div class="panel mt"><h2>How the RAG is calculated</h2><div class="sub">Objective thresholds</div>
+   <table><thead><tr><th>Input</th><th>What it measures</th><th>Green</th><th>Amber</th><th>Red</th></tr></thead><tbody>
+   ${REF.ragModel.map(m=>`<tr><td><b style="color:var(--cream)">${m.key}</b></td><td class="note" style="margin:0">${m.desc}</td><td>${m.g}</td><td>${m.a}</td><td>${m.r}</td></tr>`).join("")}
+   </tbody></table>
+   <div class="note">Roll-up: Green=0, Amber=1, Red=2 per input, summed (0-8) then scaled to a 0-10 score. 0-2 → GREEN, 3-5 → AMBER, 6-10 → RED. Budget tracks Byrne's fixed-price cash (on plan); vendor effort overage is reported separately as a diagnostic so it does not falsely flag Byrne's budget.</div></div>`;
+
+ $("#x-tasks").innerHTML=`<div class="grid g3">
+  <div class="panel">${srcLink(LINKS.jiraIssues,'Jira SPY')}<h2>Jira Tasks</h2><div class="sub">SPY · live</div><div class="donut-wrap">${donut(pct(jira.done,jira.total),'#2684FF',100,'DONE')}<div style="flex:1">${stack([{v:jira.done,color:'#3FA66A'},{v:jira.inprog,color:'#E38B55'},{v:jira.todo,color:'#5A3A24'}])}<div class="legend"><span><i class="sw" style="background:#3FA66A"></i>Done ${jira.done}</span><span><i class="sw" style="background:#E38B55"></i>In Prog ${jira.inprog}</span><span><i class="sw" style="background:#5A3A24"></i>To Do ${jira.todo}</span></div><div class="kpi-lbl mt">${jira.total} issues</div></div></div></div>
+  <div class="panel">${srcLink(LINKS.ssPlan,'Plan','ss')}<h2>Smartsheet Plan</h2><div class="sub">01 Project Plan · live</div><div class="donut-wrap">${donut(pct(ssDone,ssTot),'#3FA66A',100,'DONE')}<div style="flex:1">${stack([{v:ssDone,color:'#3FA66A'},{v:ssIp,color:'#E38B55'},{v:ssTot-ssDone-ssIp,color:'#5A3A24'}])}<div class="legend"><span><i class="sw" style="background:#3FA66A"></i>Done ${ssDone}</span><span><i class="sw" style="background:#E38B55"></i>In Prog ${ssIp}</span><span><i class="sw" style="background:#5A3A24"></i>To Do ${ssTot-ssDone-ssIp}</span></div><div class="kpi-lbl mt">${ssTot} tasks</div></div></div></div>
+  <div class="panel"><h2>Combined</h2><div class="sub">All tasks</div><div class="donut-wrap">${donut(combPct,'#D4A853',100,'DONE')}<div><div class="kpi sm">${totDone}/${totTasks}</div><div class="kpi-lbl">${combPct}% complete</div></div></div></div></div>
+  <div class="panel mt"><h2>Task Burn-Up</h2><div class="sub">Cumulative tasks completed vs the planned ramp · Phase 0 (Jira + Smartsheet)</div>
+   ${(()=>{const cats=["Wk 1","Wk 2","Wk 3","Wk 4","Wk 5","Wk 6"];const scope=cats.map(()=>totTasks);const planned=cats.map((w,i)=>Math.round(totTasks*(i+1)/6));const actual=[Math.round(totDone*0.45),totDone,null,null,null,null];return lineChartV({cats,w:780,h:270,fmt:v=>Math.round(v),gridFmt:v=>Math.round(v),series:[{name:'Scope',color:'#A9832C',data:scope,dash:true},{name:'Planned',color:'#4F86C6',data:planned},{name:'Completed',color:'#5FA052',data:actual}]});})()}
+   <div class="legend"><span><i class="sw" style="background:#A9832C"></i>Scope (${totTasks} total)</span><span><i class="sw" style="background:#4F86C6"></i>Planned completion</span><span><i class="sw" style="background:#5FA052"></i>Completed (${totDone})</span></div>
+   <div class="note">The distance between Completed and Planned is the schedule cushion or slip. Weekly history starts accruing now, so early weeks are estimated.</div></div>
+  <div class="panel mt">${srcLink(LINKS.jiraIssues,'Jira SPY')}<h2>Task Completion by Person${why('velocity')}</h2><div class="sub">Jira + Smartsheet combined · velocity ranking — who is completing tasks fastest</div>
+   <table><thead><tr><th style="width:46px">Velocity Rank</th><th>Person</th><th style="width:50px">Total</th><th style="width:50px">Done</th><th style="width:160px">% Complete</th><th style="width:84px">Velocity</th><th style="width:78px">Rating</th></tr></thead><tbody>
+   ${pplArr.map((p,i)=>`<tr><td style="text-align:center"><b style="font-family:Georgia;font-size:16px;color:${i===0?'var(--gold-br)':i<3?'var(--gold)':'var(--text-muted)'}">${i+1}</b></td><td><b style="color:var(--cream)">${p.n}</b></td><td>${p.tot}</td><td>${p.done}</td><td><div style="display:flex;align-items:center;gap:7px"><div class="bar" style="flex:1;margin:0"><i style="width:${p.pct}%;background:${i===0?'#F4C870':'#D4A853'}"></i></div><span class="mini" style="width:32px">${p.pct}%</span></div></td><td><b style="color:var(--cream)">${p.vel.toFixed(1)}</b><span class="mini"> /wk</span></td><td><span class="tag-rag ${velCls(p.vel)}">${velRate(p.vel)}</span></td></tr>`).join("")}
+   </tbody></table>
+   <div class="note">Velocity = tasks completed ÷ ${weeksElapsed} weeks elapsed since the Jun 16 kickoff. Rank #1 is completing tasks the fastest. Rating: High ≥2/wk · Steady ≥1 · Building ≥0.5 · Ramping &gt;0. Unassigned items excluded; totals span all assigned SPY Jira issues plus 01 Project Plan tasks.</div></div>`;
+
+ $("#x-risks").innerHTML=`<div class="grid g4"><div class="panel bad"><h2>Red</h2><div class="kpi">${red}</div><div class="kpi-lbl">critical open</div></div><div class="panel warn"><h2>Amber</h2><div class="kpi">${amber}</div><div class="kpi-lbl">elevated</div></div><div class="panel good"><h2>Green</h2><div class="kpi">${green}</div><div class="kpi-lbl">monitored</div></div><div class="panel"><h2>Severe</h2><div class="kpi">${severe}</div><div class="kpi-lbl">severity 8+</div></div></div>
+  <div class="panel mt">${srcLink(LINKS.ssRisk,'Risk Log','ss')}<h2>Risk Heat Map${why('riskrag')}</h2><div class="sub">Likelihood × Impact (1–5) · the number in each cell is how many open risks sit there</div>${heatmap(rk)}</div>
+  <div class="panel mt">${srcLink(LINKS.ssRisk,'Risk Log','ss')}<h2>Risk Register — Ranked by Severity${why('riskrag')}</h2><div class="sub">Live · top 15 of ${rk.length} scored risks · click ↗ to open and update the source</div>
+   <table><thead><tr><th style="width:32px">Sev</th><th>Risk</th><th style="width:66px">RAG</th><th style="width:110px">Workstream</th><th>Mitigation</th></tr></thead><tbody>
+   ${topRisks.map(r=>`<tr><td><b style="font-family:Georgia;font-size:15px;color:${r.s>=8?'var(--bad-br)':r.s>=5?'var(--warn)':'var(--text-muted)'}">${r.s||'—'}</b></td><td><b style="color:var(--cream)">${r.t}</b></td><td>${r.rag?ragTag(r.rag):''}</td><td class="mini">${r.ws}</td><td class="note" style="margin:0">${r.m}</td></tr>`).join("")}
+   </tbody></table></div>`;
+
+ const pctConsumed=Math.round(ac/REF.phase0Budget*100), pctElapsed=Math.round(REF.asElapsed*100);
+ const cpiNow=ac?evFix/ac:0, spiNow=pvNow?evFix/pvNow:0;
+ const GV='var(--good)',AV='var(--warn)',RV='var(--bad-br)';
+ const _ppl=Math.round(REF.plannedPctByNow*100)||1, _evr=combPct/_ppl;
+ const evmStrip=`<div class="panel"><h2>EVM At A Glance${why('overall')}</h2><div class="sub">Three verdicts at a glance: on budget, burning at the right pace, earning the value</div><div class="grid g3" style="gap:20px">`+
+  bulletCard({label:'Budget',big:money(ac),verdict:ac<=pvNow?'Within Budget':ac<=pvNow*1.1?'Watch':'Over Budget',vcolor:ac<=pvNow?GV:ac<=pvNow*1.1?AV:RV,value:ac,target:pvNow,max:pvNow*1.6,barColor:'#5FA052',bands:[{from:0,to:pvNow,color:'#3E7142'},{from:pvNow,to:pvNow*1.1,color:'#B07A1E'},{from:pvNow*1.1,to:pvNow*1.6,color:'#B33A1B'}],sub:'effort spent vs '+money(pvNow)+' planned to date',vlab:money(ac),tlab:money(pvNow)})+
+  bulletCard({label:'Burn',big:pctConsumed+'%',verdict:Math.abs(pctConsumed-pctElapsed)<=8?'On Pace':pctConsumed>pctElapsed?'Hot':'Behind Spend',vcolor:Math.abs(pctConsumed-pctElapsed)<=8?GV:pctConsumed>pctElapsed?RV:AV,value:pctConsumed,target:pctElapsed,max:100,barColor:'#4F86C6',bands:[{from:0,to:pctElapsed+8,color:'#3E7142'},{from:pctElapsed+8,to:100,color:'#B33A1B'}],sub:pctConsumed+'% budget used vs '+pctElapsed+'% time elapsed',vlab:pctConsumed+'%',tlab:pctElapsed+'%'})+
+  bulletCard({label:'Earned Value',big:combPct+'%',verdict:_evr>=0.9?'On Track':_evr>=0.6?'Building':'Behind',vcolor:_evr>=0.9?GV:_evr>=0.6?AV:RV,value:combPct,target:_ppl,max:100,barColor:'#A9832C',bands:[{from:0,to:Math.round(_ppl*0.6),color:'#B33A1B'},{from:Math.round(_ppl*0.6),to:Math.round(_ppl*0.9),color:'#B07A1E'},{from:Math.round(_ppl*0.9),to:100,color:'#3E7142'}],sub:combPct+'% scope earned vs '+_ppl+'% planned',vlab:combPct+'%',tlab:_ppl+'%'})+
+  `</div></div>`;
+ $("#x-budget").innerHTML=evmStrip+`<div class="grid g4 mt">
+  <div class="panel"><h2>BAC</h2><div class="sub">Budget at completion</div><div class="kpi sm">${money(REF.bac)}</div><div class="kpi-lbl">${money(REF.perMonth)}/mo × ${REF.months} fixed</div></div>
+  <div class="panel"><h2>Byrne Cost</h2><div class="sub">Fixed-price, to date</div><div class="kpi sm">${money(REF.byrnePlannedToDate)}</div><div class="kpi-lbl">on the monthly plan</div></div>
+  <div class="panel"><h2>Effort (AC)</h2><div class="sub">Hours × rate</div><div class="kpi sm">${money(ac)}</div><div class="kpi-lbl">${consList.length} billable consultants</div></div>
+  <div class="panel ${cpiEffort<0.85?'warn':'good'}"><h2>Effort CPI</h2><div class="sub">Earned ÷ effort</div><div class="kpi">${cpiEffort.toFixed(2)}</div><div class="kpi-lbl">vendor staffing efficiency</div></div>
+ </div>
+  <div class="grid g4 mt">
+   <div class="panel"><h2>Planned Value</h2><div class="sub">PV · to date</div><div class="kpi sm">${money(pvNow)}</div><div class="kpi-lbl">fixed-price plan</div></div>
+   <div class="panel"><h2>Earned Value</h2><div class="sub">EV · Phase 0</div><div class="kpi sm">${money(evFix)}</div><div class="kpi-lbl">${combPct}% of scope</div></div>
+   <div class="panel ${cv<0?'warn':'good'}"><h2>Cost Variance</h2><div class="sub">CV = EV − AC</div><div class="kpi sm">${cv<0?'−':''}${money(Math.abs(cv))}</div><div class="kpi-lbl">${cv<0?'effort over earned':'favorable'}</div></div>
+   <div class="panel ${sv<0?'warn':'good'}"><h2>Schedule Variance</h2><div class="sub">SV = EV − PV</div><div class="kpi sm">${sv<0?'−':''}${money(Math.abs(sv))}</div><div class="kpi-lbl">${sv<0?'behind plan':'ahead'}</div></div>
+  </div>
+  <div class="grid mt">
+   <div class="panel">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>Earned Value Analysis</h2><div class="sub">Phase 0 · PV / EV / AC vs BAC ($) · value shown at each point</div>
+    ${lineChartV({cats:weeksX, w:780, h:300, fmt:moneyK, gridFmt:moneyK, baseline:{v:BAC0,label:'BAC '+moneyK(BAC0),color:'#A9832C'},
+      series:[{name:'PV',color:'#4F86C6',data:pvSeries},{name:'EV',color:'#5FA052',data:evSeries},{name:'AC',color:'#C0392B',data:acSeries}]})}
+    <div class="legend"><span><i class="sw" style="background:#4F86C6"></i>PV — planned value</span><span><i class="sw" style="background:#5FA052"></i>EV — earned value</span><span><i class="sw" style="background:#C0392B"></i>AC — actual cost (effort)</span><span><i class="sw" style="background:#A9832C"></i>BAC — budget at completion</span></div></div>
+  </div>
+  <div class="grid g2 mt">
+   <div class="panel">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>Estimate at Completion</h2><div class="sub">EAC (effort to complete) vs BAC ($)</div>
+    ${lineChartV({cats:weeksX, w:380, h:260, fmt:moneyK, gridFmt:moneyK,
+      series:[{name:'BAC',color:'#A9832C',data:bacSeries},{name:'EAC',color:'#9DC3E6',data:eacSeries,dash:true,connect:true}]})}
+    <div class="legend"><span><i class="sw" style="background:#A9832C"></i>BAC ${moneyK(BAC0)}</span><span><i class="sw" style="background:#9DC3E6"></i>EAC forecast</span></div>
+    <div class="note">EAC = AC + (BAC − EV); final point = BAC ÷ CPI. Above BAC means the vendor expends more effort than the fixed Phase 0 price — value to Byrne, margin pressure for Automus.</div></div>
+   <div class="panel">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>Variance Analysis</h2><div class="sub">CV = EV − AC · SV = EV − PV ($)</div>
+    ${lineChartV({cats:weeksX, w:380, h:260, fmt:moneyKs, gridFmt:moneyKs, baseline:{v:0,label:'on plan',color:'#7A6438'},
+      series:[{name:'CV',color:'#5FA052',data:cvSeries},{name:'SV',color:'#4F86C6',data:svSeries}]})}
+    <div class="legend"><span><i class="sw" style="background:#5FA052"></i>CV — cost variance</span><span><i class="sw" style="background:#4F86C6"></i>SV — schedule variance</span></div></div>
+  </div>
+  <div class="grid g2 mt">
+   <div class="panel">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>Performance Index</h2><div class="sub">CPI = EV ÷ AC · SPI = EV ÷ PV · bullet bar vs the 1.0 target marker</div>
+    <div class="grid g2" style="gap:14px;margin-top:8px">
+     ${bulletCard({label:'CPI · Cost',big:cpiNow.toFixed(2),verdict:cpiNow>=0.95?'On Target':cpiNow>=0.8?'Below':'Behind',vcolor:cpiNow>=0.95?GV:cpiNow>=0.8?AV:RV,value:cpiNow,target:1,max:1.5,barColor:'#5FA052',bands:[{from:0,to:0.8,color:'#B33A1B'},{from:0.8,to:1,color:'#B07A1E'},{from:1,to:1.5,color:'#3E7142'}],sub:'earned ÷ effort, target 1.0',vlab:cpiNow.toFixed(2),tlab:'1.00'})}
+     ${bulletCard({label:'SPI · Schedule',big:spiNow.toFixed(2),verdict:spiNow>=0.95?'On Target':spiNow>=0.8?'Below':'Behind',vcolor:spiNow>=0.95?GV:spiNow>=0.8?AV:RV,value:spiNow,target:1,max:1.5,barColor:'#4F86C6',bands:[{from:0,to:0.8,color:'#B33A1B'},{from:0.8,to:1,color:'#B07A1E'},{from:1,to:1.5,color:'#3E7142'}],sub:'earned ÷ planned, target 1.0',vlab:spiNow.toFixed(2),tlab:'1.00'})}
+    </div>
+    <div class="note">Bars below the 1.0 marker mean earned value is trailing spend (CPI) or schedule (SPI), which is normal this early in the sprint.</div></div>
+   <div class="panel"><h2>How to Read This</h2><div class="sub">Effort-based EVM</div>
+    <div class="note" style="font-size:11.5px;color:var(--text-muted);line-height:1.7">PV, EV and AC are measured in <b style="color:var(--cream)">effort dollars</b> (consultant hours × $${REF.rate}). Byrne pays a fixed ${money(REF.perMonth)}/month regardless, so Byrne's cash variance is zero by construction and drives the budget RAG. A CPI below 1.0 means earned value is trailing the effort spent so far — normal early in a sprint; the trend matters more than any single week. The <b style="color:var(--cream)">Budget</b> tab shows the cash view (planned vs billed by week) and the full consultant ledger.</div></div>
+  </div>
+  <div class="note" style="padding:0 4px">EVM is effort-based. Byrne's fixed-price cash variance is zero by construction (on the $200k/mo plan), so the budget RAG tracks that. The effort CPI compares earned value to consultant effort; hours are a current SWAG (Shay 40h/wk, all other consultants 20h/wk, Magdalena Krol 0h) and refine when bi-monthly actuals post.</div>`;
+
+ /* ===== BUDGET DASHBOARD TAB (cash view + consultant billings) ===== */
+ const baRows=baCats.map((c,i)=>{const b=baBudget[i],a=baActual[i],v=a-b,vp=b?Math.round(v/b*100):0;return {c,b,a,v,vp};});
+ const baTB=baBudget.reduce((x,y)=>x+y,0), baTA=baActual.reduce((x,y)=>x+y,0), baTV=baTA-baTB, baTVP=baTB?Math.round(baTV/baTB*100):0;
+ const vCell=v=>`<span style="color:${v<=0?'var(--good)':'var(--bad-br)'};font-weight:700">${v<0?'('+money(Math.abs(v)).slice(1)+')':money(v).slice(1)}</span>`;
+ const indCell=v=>v<=0?'<span style="color:var(--good);font-weight:700">▲ under</span>':'<span style="color:var(--bad-br);font-weight:700">▼ over</span>';
+ $("#x-budgetdash").innerHTML=`<div class="grid g4">
+  <div class="panel">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>BAC</h2><div class="sub">Budget at completion</div><div class="kpi sm">${money(REF.bac)}</div><div class="kpi-lbl">${money(REF.perMonth)}/mo × ${REF.months} fixed</div></div>
+  <div class="panel good"><h2>Byrne Cost</h2><div class="sub">Fixed-price, to date</div><div class="kpi sm">${money(REF.byrnePlannedToDate)}</div><div class="kpi-lbl">on the monthly plan</div></div>
+  <div class="panel">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>Effort Billed (AC)</h2><div class="sub">Hours × rate</div><div class="kpi sm">${money(ac)}</div><div class="kpi-lbl">${consList.length} consultants</div></div>
+  <div class="panel ${baTV<=0?'good':'warn'}"><h2>Period Variance</h2><div class="sub">Actual − Budget</div><div class="kpi sm" style="color:${baTV<=0?'var(--good)':'var(--bad-br)'}">${baTV<=0?'−':'+'}${money(Math.abs(baTV)).slice(1)}</div><div class="kpi-lbl">${baTVP}% vs planned staffing</div></div>
+ </div>
+  <div class="grid g2 mt">
+   <div class="panel">${srcLink(LINKS.ssBill,'Billings','ss')}<div style="background:#3E7142;color:#fff;font-family:Georgia,serif;font-size:14px;letter-spacing:.04em;padding:8px 13px;border-radius:4px 4px 0 0;margin:-13px -15px 13px">Budget vs. Actual Dashboard ${why('budgetstatus')}</div>
+    <table><thead><tr><th>Category</th><th style="text-align:right">Budget</th><th style="text-align:right">Actual</th><th style="text-align:right">Var</th><th style="text-align:right">Var %</th><th style="text-align:center">Status</th></tr></thead><tbody>
+    ${baRows.map(r=>`<tr><td><b style="color:var(--cream)">${r.c}</b></td><td style="text-align:right">${money(r.b)}</td><td style="text-align:right">${money(r.a)}</td><td style="text-align:right">${vCell(r.v)}</td><td style="text-align:right;color:${r.vp<=0?'var(--good)':'var(--bad-br)'};font-weight:700">${r.vp>0?'+':''}${r.vp}%</td><td style="text-align:center">${indCell(r.v)}</td></tr>`).join("")}
+    <tr style="border-top:2px solid #3E7142"><td><b>Total to date</b></td><td style="text-align:right"><b>${money(baTB)}</b></td><td style="text-align:right"><b>${money(baTA)}</b></td><td style="text-align:right"><b>${vCell(baTV)}</b></td><td style="text-align:right;font-weight:700;color:${baTVP<=0?'var(--good)':'var(--bad-br)'}">${baTVP>0?'+':''}${baTVP}%</td><td style="text-align:center">${indCell(baTV)}</td></tr>
+    </tbody></table>
+    <div class="note">Budget = planned full staffing (${consList.length} consultants × 40h × $${REF.rate}/wk). Actual = effort billed — a SWAG pending bi-monthly actuals: Shay 40h/wk, all other consultants 20h/wk, Magdalena Krol 0h. Under budget is favorable (▲); over is unfavorable (▼).</div></div>
+   <div class="panel">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>Budget vs. Actual by Week</h2><div class="sub">Per billing week · grey bars + colored variance · $ on each bar</div>
+    ${budgetActual(baRows,{w:540,h:330})}
+    <div class="note">Grey bars compare planned <b style="color:var(--cream)">Budget</b> against billed <b style="color:var(--cream)">Actual</b> each week; the colored box marks the gap — green ▲ under budget, red ▼ over.</div></div>
+  </div>
+  <div class="panel mt">${srcLink(LINKS.ssBill,'Billings','ss')}<h2>Consultant Billings — June (live)</h2><div class="sub">16 Billings Log · estimated, pending bi-monthly actuals</div>
+   <table><thead><tr><th>Consultant</th><th>Firm</th><th>Role</th><th style="width:60px;text-align:right">Hours</th><th style="width:70px;text-align:right">Rate</th><th style="width:90px;text-align:right">Amount</th></tr></thead><tbody>
+   ${consList.map(([n,c])=>`<tr><td><b style="color:var(--cream)">${n}</b></td><td class="mini">${c.firm}</td><td class="mini">${c.role}</td><td style="text-align:right">${c.hours}</td><td style="text-align:right">$${REF.rate}</td><td style="text-align:right">${money(c.amt)}</td></tr>`).join("")}
+   <tr style="border-top:2px solid var(--gold)"><td colspan="3"><b>Total effort to date</b></td><td style="text-align:right"><b>${consList.reduce((a,[,c])=>a+c.hours,0)}</b></td><td></td><td style="text-align:right"><b style="color:var(--gold-br)">${money(ac)}</b></td></tr>
+   </tbody></table>
+   <div class="note">$${REF.rate}/hr · SWAG pending bi-monthly actuals: Shay Abbott 40h/wk · all other consultants 20h/wk · Magdalena Krol 0h. Kickoff Jun 16.</div></div>`;
+
+ const dCls=s=>s==="Complete"?"rag-green":s==="In Progress"?"rag-amber":"rag-red";
+ $("#x-deliverables").innerHTML=`<div class="panel">${srcLink(LINKS.ssPlan,'Plan','ss')}<h2>Phase 0 Deliverable Tracker</h2><div class="sub">D1-D16 · Automus weekly status + 01 Project Plan</div>
+  <table><thead><tr><th style="width:46px">Ref</th><th>Deliverable</th><th style="width:130px">Owner</th><th style="width:100px">Status</th><th style="width:62px">Due</th></tr></thead><tbody>
+  ${REF.deliverables.map(d=>`<tr><td><b style="color:var(--gold)">${d[0]}</b></td><td>${d[1]}</td><td class="mini">${d[2]}</td><td><span class="tag-rag ${dCls(d[3])}">${d[3]}</span></td><td class="mini">${d[4]}</td></tr>`).join("")}
+  </tbody></table></div>`;
+
+ const kT=REF.kpis.length, kB=REF.kpis.filter(k=>/\d/.test(k[1])).length;
+ const kdir=t=>(/^\s*[<\-−]|reduce/i.test(t)?'down':'up');
+ $("#x-kpis").innerHTML=`<div class="grid g4">
+  <div class="panel">${srcLink(LINKS.ssPlan,'Plan','ss')}<h2>KPIs Tracked</h2><div class="sub">Outcome measures</div><div class="kpi">${kT}</div><div class="kpi-lbl">across the program</div></div>
+  <div class="panel good"><h2>Targets Defined</h2><div class="sub">Goals agreed</div><div class="donut-wrap">${donut(100,'#3E7142',96,'DEFINED')}<div><div class="kpi sm">${kT}/${kT}</div><div class="kpi-lbl">100% set</div></div></div></div>
+  <div class="panel warn"><h2>Baselines Set</h2><div class="sub">Phase 0 · D10</div><div class="donut-wrap">${donut(Math.round(kB/kT*100),'#A9832C',96,'BASELINED')}<div><div class="kpi sm">${kB}/${kT}</div><div class="kpi-lbl">in progress</div></div></div></div>
+  <div class="panel"><h2>Now Measuring</h2><div class="sub">Live tracking</div><div class="donut-wrap">${donut(0,'#8C6E54',96,'MEASURING')}<div><div class="kpi sm">0/${kT}</div><div class="kpi-lbl">begins post-baseline</div></div></div></div>
+ </div>
+ <div class="panel mt">${srcLink(LINKS.ssPlan,'Plan','ss')}<h2>KPI Targets & Improvement${why('velocity')}</h2><div class="sub">The improvement goal for each KPI · baselines and live values populate as Phase 0 D10 completes · anchor KPI: OTIF</div>
+  <div class="grid g2" style="gap:13px">
+  ${REF.kpis.map(k=>{const d=kdir(k[2]);const dc=d==='up'?'var(--good)':'var(--warn)';return `<div style="border:1px solid var(--border-lt);border-radius:6px;padding:11px 13px;background:var(--bg-surface)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><b style="color:var(--cream);font-size:12.5px">${k[0]}</b><span class="chip ss">WS${k[3]}</span></div>
+    <div style="display:flex;align-items:baseline;gap:9px;margin-top:7px"><span style="font-family:Georgia,serif;font-size:26px;color:var(--gold-br)">${k[2]}</span><span class="mini" style="color:${dc}">${d==='up'?'▲ higher is better':'▼ lower is better'} · target</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span class="mini">Baseline: ${k[1]}</span><span class="tag-rag" style="background:var(--bg-panel);color:var(--text-dim);border:1px solid var(--border-lt)">MEASUREMENT PENDING</span></div>
+   </div>`;}).join("")}
+  </div>
+  <div class="note">Targets are defined and agreed (100%). Baselines are being established in Phase 0 (D10); once set, each card will show the current value against target with a trend arrow and a fill-to-goal bar. OTIF (On Time + In Full) is the program's anchor KPI.</div></div>`;
+
+ $("#x-ocm").innerHTML=`<div class="panel" style="text-align:center;padding:70px 24px">
+  <div style="font-family:Georgia,serif;font-size:12px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase">Organizational Change Management</div>
+  <div style="font-family:Georgia,serif;font-size:42px;color:var(--cream);margin:16px 0 8px">Coming Soon</div>
+  <div class="note" style="font-size:13px;max-width:520px;margin:0 auto">The OCM dashboard — adoption, change-readiness, training coverage and stakeholder engagement metrics — is in development.</div></div>`;
+ $("#x-weekly").innerHTML=`<div class="grid g2"><div class="panel"><h2>Weekly Status</h2><div class="sub">Phase 0 · Week 2 of 6 · PM Shay Abbott</div><p class="exec">${REF.exec}</p><div class="note mt">Automus self-report: <span class="tag-rag rag-green">ON TRACK</span> · Byrne objective rating: ${ragTag(overall)} (score ${score10}/10)</div></div>
+  <div class="panel"><h2>Watch Points</h2><div class="sub">This week</div><table><tbody>
+   <tr><td><b style="color:var(--bad-br)">●</b> Inventory sync (WMS↔Fusion)</td><td class="mini">Intellinum on-site Jun 30</td></tr>
+   <tr><td><b style="color:var(--warn)">●</b> SOW execution</td><td class="mini">Finalize and sign</td></tr>
+   <tr><td><b style="color:var(--warn)">●</b> D2 Business Case (v1)</td><td class="mini">Due Jun 30</td></tr>
+   <tr><td><b style="color:var(--warn)">●</b> D9a Quick-Wins (v1)</td><td class="mini">Due Jun 30</td></tr></tbody></table></div></div>`;
+}
+/* ===== EMBEDDED DATA (point-in-time, 28 Jun 2026) ===== */
+const D_BILL=[{"Consultant": "Anand Yadav", "Role": "Executive Oversight", "Firm": "Intellinum", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Anand Yadav", "Role": "Executive Oversight", "Firm": "Intellinum", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Faisal Siddiqui", "Role": "Executive Sponsor / CTO", "Firm": "Automus", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Faisal Siddiqui", "Role": "Executive Sponsor / CTO", "Firm": "Automus", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Glenn Kauffman", "Role": "Product Design Director, AI Lead", "Firm": "Automus", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Glenn Kauffman", "Role": "Product Design Director, AI Lead", "Firm": "Automus", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Herbert Jiri", "Role": "Functional Lead", "Firm": "Intellinum", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Herbert Jiri", "Role": "Functional Lead", "Firm": "Intellinum", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Ishan Modi", "Role": "Functional Lead", "Firm": "Intellinum", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Ishan Modi", "Role": "Functional Lead", "Firm": "Intellinum", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Magdalena Krol", "Role": "OCM Lead", "Firm": "Automus", "Week Start": "2026-06-15", "Hours": 0, "Amount": 0}, {"Consultant": "Magdalena Krol", "Role": "OCM Lead", "Firm": "Automus", "Week Start": "2026-06-22", "Hours": 0, "Amount": 0}, {"Consultant": "Neelan Singh", "Role": "Executive VP", "Firm": "Automus", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Neelan Singh", "Role": "Executive VP", "Firm": "Automus", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Prasad Bumireddy", "Role": "Technical Architect", "Firm": "Intellinum", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Prasad Bumireddy", "Role": "Technical Architect", "Firm": "Intellinum", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Ramalingam Subramanian", "Role": "Reporting Lead", "Firm": "Automus", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Ramalingam Subramanian", "Role": "Reporting Lead", "Firm": "Automus", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Shay Abbott", "Role": "Project Manager", "Firm": "Automus", "Week Start": "2026-06-15", "Hours": 40, "Amount": 8000}, {"Consultant": "Shay Abbott", "Role": "Project Manager", "Firm": "Automus", "Week Start": "2026-06-22", "Hours": 40, "Amount": 8000}, {"Consultant": "Sunita Pandey", "Role": "Organizational Change Management", "Firm": "Automus", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Sunita Pandey", "Role": "Organizational Change Management", "Firm": "Automus", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}, {"Consultant": "Yamini Lakkaraju", "Role": "AI Consulting Lead", "Firm": "Automus", "Week Start": "2026-06-15", "Hours": 20, "Amount": 4000}, {"Consultant": "Yamini Lakkaraju", "Role": "AI Consulting Lead", "Firm": "Automus", "Week Start": "2026-06-22", "Hours": 20, "Amount": 4000}];
+const D_RISKS=[{"Title": "Order pushes/cuts not systematically tracked", "Severity (1-10)": "8", "RAG": "Red", "Workstream": "3 (Reporting Library & Governance), 4.2 (Supply Planning)", "Response / Mitigation / Action": "Automate OVI, integrate reason codes, track pushes/cuts. Owners: Curt/Scott.", "L": 4, "I": 4}, {"Title": "Walmart MABD vs internal OTIF measurement mismatch", "Severity (1-10)": "5", "RAG": "Amber", "Workstream": "3 (Reporting Library & Governance)", "Response / Mitigation / Action": "Define OTIF method accounting for MABD, explore arrival-data capture. Owner: Ariel.", "L": 2, "I": 3}, {"Title": "Vendor-managed inventory tracked outside system", "Severity (1-10)": "2", "RAG": "Green", "Workstream": "1 (Inventory Integrity & Sync Automation), 4.2 (Supply Planning)", "Response / Mitigation / Action": "Bring VMI visibility into availability checks. Owner: Procurement.", "L": 1, "I": 1}, {"Title": "Plant teams have abandoned MRP / transfer order signals", "Severity (1-10)": "8", "RAG": "Red", "Workstream": "1 (Inventory Integrity & Sync Automation), 4.2 (Supply Planning)", "Response / Mitigation / Action": "Fix inventory accuracy to rebuild trust, re-enable MRP/transfer usage. Owner: Plant Inventory Teams.", "L": 4, "I": 4}, {"Title": "Key-person dependency on manual OTIF reporting", "Severity (1-10)": "6", "RAG": "Amber", "Workstream": "3 (Reporting Library & Governance)", "Response / Mitigation / Action": "Automate OVI/OTIF sourcing, review with Tim Peglow, Ashley De Jesus, Ken Peglow.", "L": 3, "I": 4}, {"Title": "Oracle 26B Agentic Apps framework slips, blocking WS6 Spyglass Phase 3", "Severity (1-10)": "", "RAG": "Amber", "Workstream": "6 (Spyglass Production Dashboards)", "Response / Mitigation / Action": "Contingency: begin Phase 3 WS6 with custom agentic app on OCI/VBCS, migrate to 26B when available.", "L": 2, "I": 4}, {"Title": "Master data quality discovers blockers that delay WS6 Spyglass design start", "Severity (1-10)": "", "RAG": "Amber", "Workstream": "2 (Master Data & Production Logic), 6 (Spyglass Production Dashboards)", "Response / Mitigation / Action": "WS2 Phase 0 assessment produces remediation roadmap with 80% completion gate.", "L": 2, "I": 3}, {"Title": "Catch-weight and shelf-life constraints in Production Scheduling exceed config limits", "Severity (1-10)": "", "RAG": "Amber", "Workstream": "4.2 (Supply Planning)", "Response / Mitigation / Action": "Production scheduling constraint catalogue executed in Phase 1. Custom extension points identified early.", "L": 3, "I": 3}, {"Title": "Master data and pricing changes lack audit trail and approval workflow", "Severity (1-10)": "8", "RAG": "Red", "Workstream": "2 (Master Data & Production Logic), 5 (Financial Close & Exception Automation)", "Response / Mitigation / Action": "LSCC to review Oracle audit/control config and implement approval workflows and exception reporting.", "L": 4, "I": 4}, {"Title": "Month-end costing job saturation risks delaying financial close", "Severity (1-10)": "6", "RAG": "Amber", "Workstream": "5 (Financial Close & Exception Automation)", "Response / Mitigation / Action": "Automate job scheduling with notification thresholds to reduce manual intervention at month-end.", "L": 3, "I": 3}, {"Title": "OEE and OTIF require foundational Oracle data work before they can be trusted", "Severity (1-10)": "6", "RAG": "Amber", "Workstream": "6 (Spyglass Production Dashboards)", "Response / Mitigation / Action": "Document foundational Oracle steps for trackable OEE; map data sources across the 14 nodes.", "L": 3, "I": 3}, {"Title": "Processing and filling nodes run on unaligned schedules, limiting real-time visibility", "Severity (1-10)": "5", "RAG": "Amber", "Workstream": "6 (Spyglass Production Dashboards)", "Response / Mitigation / Action": "Start with simplified assumptions; define each node's scorecard and data source.", "L": 2, "I": 3}, {"Title": "OCM change saturation across overlapping initiatives and blackout periods", "Severity (1-10)": "5", "RAG": "Red", "Workstream": "8 (AI Governance & Training)", "Response / Mitigation / Action": "Maintain a layered OCM calendar; sprint-aligned pulse checks and customized training. Owners: Kristina, Gaylen, Sunita.", "L": 5, "I": 5}, {"Title": "Inventory-sync Phase 0 assessment depends on timely access and site-visit availability", "Severity (1-10)": "5", "RAG": "Amber", "Workstream": "1 (Inventory Integrity & Sync Automation)", "Response / Mitigation / Action": "Provide access/credentials to Shay; confirm Jun 30-Jul 1 schedule and functional-lead availability.", "L": 2, "I": 3}, {"Title": "SOW not yet signed", "Severity (1-10)": "10", "RAG": "Amber", "Workstream": "0 (Program Foundation & Governance)", "Response / Mitigation / Action": "Route SOW + Appendix A for signature by authorized signatories; confirm $60k deposit basis. Owner: Chris Clark.", "L": 2, "I": 4}, {"Title": "Limited flexibility assigning SKUs to multiple warehouses", "Severity (1-10)": "5", "RAG": "Amber", "Workstream": "4.2 (Supply Planning), 5 (Financial Close & Exception Automation)", "Response / Mitigation / Action": "Working session with Jim Obrist on SKU-to-warehouse process and supported exception handling. Owner: Chris Clark.", "L": 2, "I": 3}, {"Title": "Redwood lacks edit-in-spreadsheet for production plan entry (planned future release)", "Severity (1-10)": "5", "RAG": "Amber", "Workstream": "7 (Redwood Migration)", "Response / Mitigation / Action": "Confirm Oracle Redwood release timeline; maintain interim manual entry; reassess each quarter. Owner: Chris Clark.", "L": 3, "I": 2}, {"Title": "Finance close fails if item standard cost not maintained across all orgs", "Severity (1-10)": "7", "RAG": "Amber", "Workstream": "5 (Financial Close & Exception Automation)", "Response / Mitigation / Action": "Standardize cross-org item-cost setup; evaluate Redwood mass-update. Owner: Finance (Breanna Turnbull).", "L": 4, "I": 3}, {"Title": "Oracle AI unit pricing unclear / no consumption dashboard", "Severity (1-10)": "9", "RAG": "Red", "Workstream": "0 (Program Foundation & Governance), 8 (AI Governance & Training)", "Response / Mitigation / Action": "Add Libby (Oracle) to steering to monitor consumption/pricing; set monitoring before scale-up.", "L": 4, "I": 5}, {"Title": "Agent cost estimation excluded from Phase 0", "Severity (1-10)": "5", "RAG": "Amber", "Workstream": "0 (Program Foundation & Governance), 8 (AI Governance & Training)", "Response / Mitigation / Action": "Log risk, schedule Oracle pricing calls, revisit estimate when info available.", "L": 3, "I": 2}, {"Title": "Security and privilege exposure on OCI Gen AI", "Severity (1-10)": "9", "RAG": "Red", "Workstream": "8 (AI Governance & Training)", "Response / Mitigation / Action": "Yamini to run security and privilege assessment (D14); define leakage prevention.", "L": 4, "I": 5}, {"Title": "Oracle Redwood page readiness and performance concerns", "Severity (1-10)": "5", "RAG": "Red", "Workstream": "7 (Redwood Migration)", "Response / Mitigation / Action": "Capture performance issues in Redwood readiness (D3); assess impact on workflows.", "L": 3, "I": 5}, {"Title": "WMS vs ERP inventory discrepancies erode system trust", "Severity (1-10)": "10", "RAG": "Red", "Workstream": "1 (Inventory Integrity & Sync Automation)", "Response / Mitigation / Action": "Daily WMS-ERP reconciliation, automated reconciliation (ATP tables) plus FDI, drive to 100%. Owner: Vicky/Ariel.", "L": 5, "I": 5}, {"Title": "Oracle WMS-ERP reconciliation workbench being deprecated", "Severity (1-10)": "7", "RAG": "Amber", "Workstream": "1 (Inventory Integrity & Sync Automation)", "Response / Mitigation / Action": "Evaluate ATP-table automated reconciliation, increase refresh, centralize in FDI. Owner: Vicky.", "L": 5, "I": 2}, {"Title": "In-transit inventory not visible", "Severity (1-10)": "6", "RAG": "Amber", "Workstream": "1 (Inventory Integrity & Sync Automation)", "Response / Mitigation / Action": "Investigate why in-transit disappears; surface FG/raw in-transit in reports. Owner: Breanna/Planning.", "L": 3, "I": 3}, {"Title": "Volatile production schedule limits OVI automation", "Severity (1-10)": "6", "RAG": "Amber", "Workstream": "4.2 (Supply Planning)", "Response / Mitigation / Action": "Automate OVI for real-time exceptions, improve inventory accuracy. Owners: Justin/Ariel.", "L": 2, "I": 4}, {"Title": "Milk and key ingredients excluded from Oracle", "Severity (1-10)": "8", "RAG": "Amber", "Workstream": "4.2 (Supply Planning)", "Response / Mitigation / Action": "Map process, optimize/automate within constraints, assess milk integration. Owners: Justin/Jeff.", "L": 3, "I": 3}, {"Title": "Stakeholder availability could slow sprint momentum", "Severity (1-10)": "2", "RAG": "Green", "Workstream": "0 (Program Foundation & Governance)", "Response / Mitigation / Action": "Stakeholders provide info promptly, flag availability to PM. Owner: Byrne Team/Shay.", "L": 3, "I": 1}, {"Title": "Sales/production sequencing and lead-time discrepancies", "Severity (1-10)": "5", "RAG": "Green", "Workstream": "4.2 (Supply Planning)", "Response / Mitigation / Action": "Improve item attributes (days of cover) and auto modifiers in Oracle. Owners: Justin/LSCC.", "L": 2, "I": 2}, {"Title": "WS4 Demand Mgmt hypertuning underperforms due to demand history anomalies", "Severity (1-10)": "", "RAG": "Amber", "Workstream": "4.1 (Demand Planning)", "Response / Mitigation / Action": "Demand history depth and anomaly audit executed in Phase 1 blueprint. Anomaly treatment per item family.", "L": 3, "I": 4}, {"Title": "Plant-floor adoption resistance", "Severity (1-10)": "", "RAG": "Amber", "Workstream": "6 (Spyglass Production Dashboards)", "Response / Mitigation / Action": "OCM heavy in Discovery; daily production huddles anchored to Spyglass from go-live; adoption metrics monthly.", "L": 4, "I": 3}, {"Title": "Byrne SME availability", "Severity (1-10)": "", "RAG": "Amber", "Workstream": "0 (Program Foundation & Governance)", "Response / Mitigation / Action": "Sprint plans built around 15-20% SME availability; heavier offshore mix during peaks.", "L": 3, "I": 4}, {"Title": "Onshore/offshore handoff", "Severity (1-10)": "", "RAG": "Green", "Workstream": "0 (Program Foundation & Governance)", "Response / Mitigation / Action": "Onshore lead approves all design before offshore build; code review gates with onshore sign-off.", "L": 1, "I": 2}, {"Title": "Lean team sizing", "Severity (1-10)": "", "RAG": "Amber", "Workstream": "0 (Program Foundation & Governance)", "Response / Mitigation / Action": "Aggressive use of FAiSOps/FAiSAccelerate; stage gate criteria non-negotiable, scope flexes not quality.", "L": 3, "I": 3}, {"Title": "Project GitHub repository not under Byrne ownership; no dedicated Spyglass repository exists", "Severity (1-10)": "", "RAG": "Green", "Workstream": "0 (Program Foundation & Governance)", "Response / Mitigation / Action": "Transfer repository into a Byrne-owned GitHub org; provision a dedicated Spyglass repo under Byrne ownership.", "L": 2, "I": 2}];
+const D_PLAN=[{"Status": "Done", "Assigned To": "Shay Abbott"}, {"Status": "Done", "Assigned To": "Shay Abbott"}, {"Status": "Done", "Assigned To": "Shay Abbott"}, {"Status": "Done", "Assigned To": "Shay Abbott"}, {"Status": "Done", "Assigned To": "Shay Abbott"}, {"Status": "Done", "Assigned To": "Shay Abbott"}, {"Status": "Done", "Assigned To": "Shay Abbott"}, {"Status": "Done", "Assigned To": "Shay Abbott"}, {"Status": "Done", "Assigned To": "Neelan Singh"}, {"Status": "Done", "Assigned To": "Neelan Singh"}, {"Status": "Done", "Assigned To": "Neelan Singh"}, {"Status": "Done", "Assigned To": "Neelan Singh"}, {"Status": "Done", "Assigned To": "Faisal Siddiqui"}, {"Status": "Done", "Assigned To": "Faisal Siddiqui"}, {"Status": "Done", "Assigned To": "Glenn Kauffman"}, {"Status": "Done", "Assigned To": "Glenn Kauffman"}, {"Status": "Done", "Assigned To": "Sunita Pandey"}, {"Status": "Done", "Assigned To": "Anand Yadav"}, {"Status": "Done", "Assigned To": "Ramalingam Subramanian"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "In Progress", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Shay Abbott"}, {"Status": "To Do", "Assigned To": "Neelan Singh"}, {"Status": "To Do", "Assigned To": "Neelan Singh"}, {"Status": "To Do", "Assigned To": "Neelan Singh"}, {"Status": "To Do", "Assigned To": "Neelan Singh"}, {"Status": "To Do", "Assigned To": "Neelan Singh"}, {"Status": "To Do", "Assigned To": "Neelan Singh"}, {"Status": "To Do", "Assigned To": "Neelan Singh"}, {"Status": "To Do", "Assigned To": "Faisal Siddiqui"}, {"Status": "To Do", "Assigned To": "Faisal Siddiqui"}, {"Status": "To Do", "Assigned To": "Faisal Siddiqui"}, {"Status": "To Do", "Assigned To": "Faisal Siddiqui"}, {"Status": "To Do", "Assigned To": "Glenn Kauffman"}, {"Status": "To Do", "Assigned To": "Glenn Kauffman"}, {"Status": "To Do", "Assigned To": "Glenn Kauffman"}, {"Status": "To Do", "Assigned To": "Glenn Kauffman"}, {"Status": "To Do", "Assigned To": "Glenn Kauffman"}, {"Status": "To Do", "Assigned To": "Glenn Kauffman"}, {"Status": "To Do", "Assigned To": "Glenn Kauffman"}, {"Status": "To Do", "Assigned To": "Glenn Kauffman"}, {"Status": "To Do", "Assigned To": "Sunita Pandey"}, {"Status": "To Do", "Assigned To": "Sunita Pandey"}, {"Status": "To Do", "Assigned To": "Sunita Pandey"}, {"Status": "To Do", "Assigned To": "Sunita Pandey"}, {"Status": "To Do", "Assigned To": "Sunita Pandey"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Anand Yadav"}, {"Status": "To Do", "Assigned To": "Ramalingam Subramanian"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Yamini Lakkaraju"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Chris Clark"}, {"Status": "To Do", "Assigned To": "Holly Schadt"}, {"Status": "To Do", "Assigned To": "Ken Peglow"}, {"Status": "To Do", "Assigned To": "Ken Peglow"}, {"Status": "To Do", "Assigned To": "Ken Peglow"}, {"Status": "To Do", "Assigned To": "Jill Haynesleavy"}, {"Status": "To Do", "Assigned To": "Brianna Turnbull"}, {"Status": "To Do", "Assigned To": "Magdalena Krol"}, {"Status": "To Do", "Assigned To": "Pedro Amador-Gates"}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}, {"Status": "To Do", "Assigned To": null}];
+const D_JIRA={"total": 108, "done": 11, "inprog": 9, "todo": 88, "asgTot": {"Shay Abbott": 16, "Neelan Singh": 17, "Chris Clark": 7, "Prasad Bumireddy": 3, "Glenn Kauffman": 5, "Anand Yadav": 2, "Yamini Lakkaraju": 1}, "asgDone": {"Shay Abbott": 5, "Neelan Singh": 3, "Chris Clark": 2}, "types": {}};
+window.__ASOF="2026-06-28"; render(D_BILL,D_RISKS,D_PLAN,D_JIRA);
+
+</script>
+<script>(function(){var b=document.getElementById('modebanner'); if(!b)return; b.className='modebar snap'; b.innerHTML='&#9679; DAILY SNAPSHOT &middot; Sunday, June 28, 2026 &middot; data pulled 12:46:30 PM';})();</script>
+</body>
+</html>
